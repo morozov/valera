@@ -1,0 +1,21 @@
+{
+  "name": "valera/engine",
+  "description": "Valera, the parser engine",
+  "authors": [
+    {
+      "name": "Alexander Tatulchenkov",
+      "email": "webtota@gmail.com"
+    },
+    {
+      "name": "Sergei Morozov",
+      "email": "morozov@tut.by"
+    }
+  ],
+  "license": "MIT",
+  "autoload": {
+    "psr-0": {
+      "Valera": "src/"
+    },
+    "files": ["src/bootstrap.php"]
+  }
+}
