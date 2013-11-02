@@ -17,5 +17,8 @@
       "Valera": "src/"
     },
     "files": ["src/bootstrap.php"]
-  }
+  },
+    "require": {
+        "chuyskywalker/rolling-curl": "*"
+    }
 }

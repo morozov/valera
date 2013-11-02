@@ -25,4 +25,10 @@ interface ResourceInterface
      */
     public function getHeaders();
 
+    /**
+     * Returns data that should be send by POST or PUT method
+     * @return mixed
+     */
+    public function getData();
+
 }

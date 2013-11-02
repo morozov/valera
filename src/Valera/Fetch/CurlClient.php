@@ -1,62 +1,43 @@
 <?php
 
 namespace Valera\Fetch;
+use Valera\Content;
 use Valera\Resource;
+use RollingCurl\RollingCurl;
+use RollingCurl\Request;
 
-class CurlClient implements Worker
+class CurlClient extends HttpClient
 {
-    protected $getResources = array();
-
-    protected $postResources = array();
-
-    protected $successCallback;
-
-    protected $failureCallback;
-
-    protected $completeCallback;
+    protected $options;
 
     /**
-     * @param callable $callback
-     * @return mixed
+     * @param array $options
+     * @throws \InvalidArgumentException
+     * @return CurlClient
      */
-    public function setSuccessCallback(callable $callback)
+    public function setOptions($options)
     {
-        $this->successCallback = $callback;
-        return $this;
-    }
-
-    /**
-     * @param callable $callback
-     * @return mixed
-     */
-    public function setFailureCallback(callable $callback)
-    {
-        $this->failureCallback = $callback;
-        return $this;
-    }
-
-    /**
-     * @param callable $callback
-     * @return mixed
-     */
-    public function setCompleteCallback(callable $callback)
-    {
-        $this->completeCallback = $callback;
-        return $this;
-    }
-
-    /**
-     * @param \Valera\Resource $resource
-     * @return mixed
-     */
-    public function addResource(Resource $resource)
-    {
-        if ($resource->getMethod === Resource::METHOD_GET) {
-            $this->getResources[$resource->getUrl()] = $resource;
-        } else {
-            $this->postResources[$resource->getUrl()] = $resource;
+        if (!is_array($options)) {
+            throw new \InvalidArgumentException("options must be an array");
         }
+        $this->options = $options;
+        return $this;
+    }
 
+    /**
+     * Override and add options
+     *
+     * @param array $options
+     * @throws \InvalidArgumentException
+     * @return CurlClient
+     */
+    public function addOptions($options)
+    {
+        if (!is_array($options)) {
+            throw new \InvalidArgumentException("options must be an array");
+        }
+        $this->options = $options + $this->options;
+        return $this;
     }
 
     /**
@@ -64,6 +45,27 @@ class CurlClient implements Worker
      */
     public function fetch()
     {
+        $rollingCurl = new RollingCurl();
+        if (!empty($this->options)) {
+            $rollingCurl->addOptions($this->options);
+        }
+        if (!empty($this->getResources)) {
 
+            foreach ($this->getResources as $url => $resource) {
+                $rollingCurl->get($url, $resource->getHeaders());
+            }
+            $rollingCurl
+                ->setCallback(
+                    function(Request $request, RollingCurl $rollingCurl) {
+                        $callback = $this->successCallback;
+                        $resource = $this->getResources[$request->getUrl()];
+                        $content = new Content(strval($request->getResponseText()), $resource);
+                        $callback($content);
+                    }
+                )
+                ->setSimultaneousLimit(10)
+                ->execute();
+            ;
+        }
     }
 }

@@ -10,18 +10,21 @@ class Resource implements ResourceInterface, \Serializable
 {
     const METHOD_GET = 'GET';
     const METHOD_POST = 'POST';
+    const METHOD_PUT = 'PUT';
 
     private $url;
     private $method;
     private $headers;
+    private $data;
 
     /**
      * @param $url URL of the resource
      * @param string $method HTTP method to fetch resource
      * @param array $headers
+     * @param array $data
      * @throws \InvalidArgumentException
      */
-    public function __construct($url, $method = self::METHOD_GET, array $headers = array())
+    public function __construct($url, $method = self::METHOD_GET, array $headers = array(), array $data = array())
     {
         if (!is_string($url)) {
             throw new \InvalidArgumentException(
@@ -56,6 +59,7 @@ class Resource implements ResourceInterface, \Serializable
             }
         }
         $this->headers = $headers;
+        $this->data = $data;
     }
 
     /**
@@ -83,6 +87,11 @@ class Resource implements ResourceInterface, \Serializable
     public function getHeaders()
     {
         return $this->headers;
+    }
+
+    public function getData()
+    {
+        return $this->data;
     }
 
     /**
