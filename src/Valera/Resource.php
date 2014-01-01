@@ -2,30 +2,36 @@
 
 namespace Valera;
 
+use Serializable;
+
 /**
  * Class Resource
  * @package Valera
  */
-class Resource implements ResourceInterface, \Serializable
+class Resource implements Serializable
 {
     const METHOD_GET = 'GET';
     const METHOD_POST = 'POST';
-    const METHOD_PUT = 'PUT';
 
     private $url;
     private $method;
     private $headers;
     private $data;
+    private $hash;
 
     /**
-     * @param $url URL of the resource
+     * @param $url string URL of the resource
      * @param string $method HTTP method to fetch resource
      * @param array $headers
      * @param array $data
      * @throws \InvalidArgumentException
      */
-    public function __construct($url, $method = self::METHOD_GET, array $headers = array(), array $data = array())
-    {
+    public function __construct(
+        $url,
+        $method = self::METHOD_GET,
+        array $headers = array(),
+        array $data = array()
+    ) {
         if (!is_string($url)) {
             throw new \InvalidArgumentException(
                 sprintf('URL should be a string, %s given', gettype($url))
@@ -51,7 +57,7 @@ class Resource implements ResourceInterface, \Serializable
             );
         }
         $this->method = $normalizedMethod;
-        foreach ($headers as $key=>$value) {
+        foreach ($headers as $key => $value) {
             if (!is_string($key) || !is_string($value)) {
                 throw new \InvalidArgumentException(
                     'All keys and values of the headers array must be of string type'
@@ -60,6 +66,8 @@ class Resource implements ResourceInterface, \Serializable
         }
         $this->headers = $headers;
         $this->data = $data;
+
+        $this->hash();
     }
 
     /**
@@ -102,12 +110,26 @@ class Resource implements ResourceInterface, \Serializable
      */
     public function serialize()
     {
-        $headers = $this->getHeaders();
-        $resource = empty($headers) ?
-            ['url' => $this->getUrl(), 'method' => $this->getMethod()] :
-            ['url' => $this->getUrl(), 'method' => $this->getMethod(), 'headers' => $this->getHeaders()];
-        return serialize($resource);
+        $params = array(
+            'url' => $this->getUrl(),
+        );
 
+        $method = $this->getMethod();
+        if ($method != self::METHOD_GET) {
+            $params['method'] = $method;
+        }
+
+        $headers = $this->getHeaders();
+        if ($headers) {
+            $params['headers'] = $headers;
+        }
+
+        $data = $this->getData();
+        if ($data) {
+            $params['data'] = $data;
+        }
+
+        return serialize($params);
     }
 
     /**
@@ -121,10 +143,24 @@ class Resource implements ResourceInterface, \Serializable
      */
     public function unserialize($serialized)
     {
-        $resource = unserialize($serialized);
-        $this->url = $resource['url'];
-        $this->method = $resource['method'];
-        $this->headers = isset($resource['headers']) ? $resource['headers'] : array();
+        $params = unserialize($serialized);
+        $this->url = $params['url'];
+
+        if (isset($params['method'])) {
+            $this->method = $params['method'];
+        } else {
+            $this->method = self::METHOD_GET;
+        }
+
+        if (isset($params['headers'])) {
+            $this->headers = $params['headers'];
+        }
+
+        if (isset($params['data'])) {
+            $this->data = $params['data'];
+        }
+
+        $this->hash();
     }
 
     /**
@@ -137,5 +173,23 @@ class Resource implements ResourceInterface, \Serializable
         return $resource->getUrl() === $this->getUrl()
             && $resource->getMethod() === $this->getMethod()
             && $resource->getHeaders() == $this->getHeaders();
+    }
+
+    /**
+     * Returns resource hash
+     *
+     * @return string
+     */
+    public function getHash()
+    {
+        return $this->hash;
+    }
+
+    /**
+     * Hashes resource
+     */
+    protected function hash()
+    {
+        $this->hash = md5(serialize($this));
     }
 }

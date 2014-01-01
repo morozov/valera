@@ -12,7 +12,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://google.com', $resource->getUrl());
         $this->assertEquals('GET', $resource->getMethod());
         $this->assertEquals(array(), $resource->getHeaders());
-
+        $this->assertEquals(array(), $resource->getData());
     }
 
     public function testEquals()
@@ -24,7 +24,6 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
 
         $resource3 = new Resource('http://ya.ru', Resource::METHOD_POST);
         $this->assertFalse($resource->equals($resource3));
-
     }
 
     public function testSerializable()
@@ -58,5 +57,4 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
     {
         $resource = new Resource('not an url');
     }
-
 }
