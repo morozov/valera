@@ -14,11 +14,12 @@ require $autoload;
 
 $client = new \Valera\Fetch\CurlClient();
 
-$google = new \Valera\Resource('http://google.com');
-$yandex = new \Valera\Resource('http://yandex.by');
-$bing = new \Valera\Resource('http://bing.com');
+$google = new \Valera\Resource('page','http://google.com');
+$yandex = new \Valera\Resource('page', 'http://yandex.by');
+$bing = new \Valera\Resource('page', 'http://bing.com');
 
-$callback = function(\Valera\ContentInterface $content) {
+$callback = function(\Valera\Response $response) {
+    $content = new \Valera\Content(strval($response->getContent()), $response->getResource());
     $text = $content->getContent();
     printf("Fetched %s, strlen=%s\n", $content->getResource()->getUrl(), mb_strlen($content->getContent()));
 };
