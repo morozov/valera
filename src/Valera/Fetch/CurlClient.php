@@ -5,6 +5,7 @@ use Valera\Content;
 use Valera\Resource;
 use RollingCurl\RollingCurl;
 use RollingCurl\Request;
+use Valera\Response;
 
 class CurlClient extends HttpClient
 {
@@ -57,10 +58,21 @@ class CurlClient extends HttpClient
             $rollingCurl
                 ->setCallback(
                     function(Request $request, RollingCurl $rollingCurl) {
-                        $callback = $this->successCallback;
                         $resource = $this->getResources[$request->getUrl()];
-                        $content = new Content(strval($request->getResponseText()), $resource);
-                        $callback($content);
+                        if ($request->getResponseErrno()===0) {
+                            $callback = $this->successCallback;
+                        } else {
+                            $callback = $this->failureCallback;
+                        }
+                        $info = $request->getResponseInfo();
+                        $response = new Response($request->getResponseText(), $info['http_code'], $resource, $info);
+                        if (is_callable($callback)) {
+                            $callback($response);
+                        }
+                        $completeCallback = $this->completeCallback;
+                        if (is_callable($completeCallback)) {
+                            $completeCallback($response);
+                        }
                     }
                 )
                 ->setSimultaneousLimit(10)
