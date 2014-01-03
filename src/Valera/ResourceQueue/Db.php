@@ -2,6 +2,7 @@
 
 namespace Valera\ResourceQueue;
 
+use Doctrine\DBAL\Connection;
 use Valera\Resource;
 use Valera\ResourceQueue;
 
@@ -13,10 +14,16 @@ use Valera\ResourceQueue;
 class Db implements ResourceQueue
 {
     /**
+     * @var \Doctrine\DBAL\Connection
+     */
+    protected $conn;
+
+    /**
      * Constructor
      */
-    public function __construct()
+    public function __construct(Connection $connection)
     {
+        $this->conn = $connection;
     }
 
     /**
@@ -29,6 +36,15 @@ class Db implements ResourceQueue
     /** @inheritDoc */
     public function enqueue(Resource $resource)
     {
+        $order = $this->conn->quoteIdentifier('order');
+        $query = <<<QUERY
+INSERT INTO
+  resource_queue (resource_id, $order)
+SELECT :resource_id, IFNULL(MAX($order), 0) + 1 FROM resource_queue;
+QUERY;
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute($resource->getHash());
     }
 
     /** @inheritDoc */
