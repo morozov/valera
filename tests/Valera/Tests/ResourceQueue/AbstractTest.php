@@ -35,7 +35,7 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertCount(0, $this->queue);
         $this->assertCount(0, $this->queue->getInProgress());
-        $this->assertCount(0, $this->queue->getSuccessful());
+        $this->assertCount(0, $this->queue->getCompleted());
         $this->assertCount(0, $this->queue->getFailed());
     }
 
@@ -68,18 +68,18 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
         $this->queue->enqueue($this->r2);
 
         $r1 = $this->queue->dequeue();
-        $this->assertContains($r1, $this->queue->getInProgress());
+        $this->assertContains($r1, $this->queue->getInProgress(), '', false, false);
 
-        $this->queue->resolveSuccessful($r1);
-        $this->assertNotContains($r1, $this->queue->getInProgress());
-        $this->assertNotContains($r1, $this->queue->getFailed());
-        $this->assertContains($r1, $this->queue->getSuccessful());
+        $this->queue->resolveCompleted($r1);
+        $this->assertNotContains($r1, $this->queue->getInProgress(), '', false, false);
+        $this->assertNotContains($r1, $this->queue->getFailed(), '', false, false);
+        $this->assertContains($r1, $this->queue->getCompleted(), '', false, false);
 
         $r2 = $this->queue->dequeue();
         $this->queue->resolveFailed($r2);
-        $this->assertNotContains($r2, $this->queue->getInProgress());
-        $this->assertNotContains($r2, $this->queue->getSuccessful());
-        $this->assertContains($r2, $this->queue->getFailed());
+        $this->assertNotContains($r2, $this->queue->getInProgress(), '', false, false);
+        $this->assertNotContains($r2, $this->queue->getCompleted(), '', false, false);
+        $this->assertContains($r2, $this->queue->getFailed(), '', false, false);
     }
 
     /**
@@ -117,6 +117,6 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
     public function resolveNotInProgress()
     {
         $this->queue->enqueue($this->r1);
-        $this->queue->resolveSuccessful($this->r1);
+        $this->queue->resolveCompleted($this->r1);
     }
 }

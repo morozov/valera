@@ -2,6 +2,12 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
+$conn = new PDO('mysql:dbname=valera', 'root', '');
+$queue = new Valera\ResourceQueue\Db($conn);
+$resource = new Valera\Resource('http://example.com/');
+$queue->enqueue($resource);
+$r = $queue->dequeue();
+exit;
 $connectionParams = array(
     'dbname' => 'valera',
     'user' => 'root',

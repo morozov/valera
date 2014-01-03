@@ -205,6 +205,6 @@ class Resource implements Serializable
      */
     protected function hash()
     {
-        $this->hash = md5(serialize($this));
+        $this->hash = md5(serialize($this), true);
     }
 }

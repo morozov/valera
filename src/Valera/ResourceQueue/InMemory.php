@@ -93,7 +93,7 @@ class InMemory implements ResourceQueue
     }
 
     /** @inheritDoc */
-    public function resolveSuccessful(Resource $resource)
+    public function resolveCompleted(Resource $resource)
     {
         $hash = $resource->getHash();
         $this->stopProgress($hash);
@@ -115,7 +115,7 @@ class InMemory implements ResourceQueue
     }
 
     /** @inheritDoc */
-    public function getSuccessful()
+    public function getCompleted()
     {
         return new ArrayIterator($this->successful);
     }

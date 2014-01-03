@@ -30,7 +30,7 @@ interface ResourceQueue extends Countable
      *
      * @param \Valera\Resource $resource
      */
-    public function resolveSuccessful(Resource $resource);
+    public function resolveCompleted(Resource $resource);
 
     /**
      * Marks given resource processing as failed
@@ -38,6 +38,11 @@ interface ResourceQueue extends Countable
      * @param \Valera\Resource $resource
      */
     public function resolveFailed(Resource $resource);
+
+    /**
+     * Cleans the queue
+     */
+    public function clean();
 
     /**
      * Returns iterator over resources in progress
@@ -51,7 +56,7 @@ interface ResourceQueue extends Countable
      *
      * @return \Iterator
      */
-    public function getSuccessful();
+    public function getCompleted();
 
     /**
      * Returns iterator over unsuccessfully processed resources
