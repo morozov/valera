@@ -44,7 +44,7 @@ class CurlClient extends HttpClient
     /**
      * @return mixed
      */
-    public function fetch()
+    public function run()
     {
         $rollingCurl = new RollingCurl();
         if (!empty($this->options)) {

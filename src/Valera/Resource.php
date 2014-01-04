@@ -37,10 +37,10 @@ class Resource implements Serializable
     ) {
         if (!is_string($type)) {
             throw new \InvalidArgumentException(
-                sprintf('Type should be a string, %s given', gettype($url))
+                sprintf('Type should be a string, %s given', gettype($type))
             );
         }
-
+        $this->type = $type;
         if (!is_string($url)) {
             throw new \InvalidArgumentException(
                 sprintf('URL should be a string, %s given', gettype($url))

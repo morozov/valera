@@ -29,4 +29,4 @@ $client->setSuccessCallback($callback);
 $client->addResource($google)
        ->addResource($yandex)
        ->addResource($bing)
-       ->fetch();
+       ->run();

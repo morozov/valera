@@ -1,6 +1,5 @@
 <?php
 namespace Valera\Fetch;
-use Valera\Resource;
 
 interface Worker
 {
@@ -23,13 +22,13 @@ interface Worker
     public function setCompleteCallback(callable $callback);
 
     /**
-     * @param \Valera\Resource $resource
+     * @param $job
      * @return mixed
      */
-    public function addResource(Resource $resource);
+    public function addJob($job);
 
     /**
      * @return mixed
      */
-    public function fetch();
+    public function run();
 }

@@ -49,7 +49,7 @@ abstract class HttpClient  implements Worker
      * @param \Valera\Resource $resource
      * @return mixed
      */
-    public function addResource(Resource $resource)
+    public function addJob($resource)
     {
         if (Resource::METHOD_GET === $resource->getMethod()) {
             $this->getResources[$resource->getUrl()] = $resource;
@@ -62,6 +62,6 @@ abstract class HttpClient  implements Worker
     /**
      * @return mixed
      */
-    abstract public function fetch();
+    abstract public function run();
 
 }
