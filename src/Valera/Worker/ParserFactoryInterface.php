@@ -1,6 +1,6 @@
 <?php
 
-namespace Valera\Fetch;
+namespace Valera\Worker;
 
 interface ParserFactoryInterface
 {

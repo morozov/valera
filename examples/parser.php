@@ -12,7 +12,7 @@ if (!file_exists($autoload)) {
 
 require $autoload;
 
-class Factory implements Valera\Fetch\ParserFactoryInterface
+class Factory implements Valera\Worker\ParserFactoryInterface
 {
 
     public function getParser($type)
@@ -48,7 +48,7 @@ $fakeResource2 = new Valera\Resource('unknown', 'http://example.com');
 $content = new Valera\Content($testContentString, $fakeResource);
 $content2 = new Valera\Content($testContentString2, $fakeResource2);
 
-$parser = new Valera\Fetch\Parser(new Factory());
+$parser = new Valera\Worker\Parser(new Factory());
 
 $parser->setSuccessCallback($successCallback)
     ->setFailureCallback($failCallback)

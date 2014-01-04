@@ -1,6 +1,6 @@
 <?php
 
-namespace Valera\Fetch;
+namespace Valera\Worker;
 use Valera\Content;
 use Valera\Resource;
 use RollingCurl\RollingCurl;

@@ -1,9 +1,9 @@
 <?php
 
-namespace Valera\Fetch;
+namespace Valera\Worker;
 use Valera\Resource;
 
-abstract class HttpClient  implements Worker
+abstract class HttpClient  implements WorkerInterface
 {
     protected $getResources = array();
 

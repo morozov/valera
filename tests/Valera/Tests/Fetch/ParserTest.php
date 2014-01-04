@@ -1,8 +1,8 @@
 <?php
 
 namespace Valera\Tests;
-use Valera\Fetch\Parser;
-use Valera\Fetch\ParserFactoryInterface;
+use Valera\Worker\Parser;
+use Valera\Worker\ParserFactoryInterface;
 use Valera\Resource;
 use Valera\Content;
 

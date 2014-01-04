@@ -20,6 +20,7 @@
   },
   "require": {
     "chuyskywalker/rolling-curl": "*",
-    "doctrine/dbal": "2.3.*"
+    "doctrine/dbal": "2.3.*",
+    "php": ">=5.4"
   }
 }

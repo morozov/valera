@@ -1,7 +1,7 @@
 <?php
-namespace Valera\Fetch;
+namespace Valera\Worker;
 
-interface Worker
+interface WorkerInterface
 {
     /**
      * @param callable $callback

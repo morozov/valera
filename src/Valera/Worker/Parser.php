@@ -1,14 +1,14 @@
 <?php
-namespace Valera\Fetch;
+namespace Valera\Worker;
 
 use Valera\Content;
-use Valera\Fetch\ParserFactoryInterface;
+use Valera\Worker\ParserFactoryInterface;
 
 /**
  * Class Parser
- * @package Valera\Fetch
+ * @package Valera\Worker
  */
-class Parser implements Worker
+class Parser implements WorkerInterface
 {
     /**
      * @var
