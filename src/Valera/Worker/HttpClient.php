@@ -49,7 +49,7 @@ abstract class HttpClient  implements WorkerInterface
      * @param \Valera\Resource $resource
      * @return mixed
      */
-    public function addJob($resource)
+    public function addResource(Resource $resource)
     {
         if (Resource::METHOD_GET === $resource->getMethod()) {
             $this->getResources[$resource->getUrl()] = $resource;

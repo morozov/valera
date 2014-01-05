@@ -22,10 +22,10 @@ interface WorkerInterface
     public function setCompleteCallback(callable $callback);
 
     /**
-     * @param $job
+     * @param \Valera\Resource $resource
      * @return mixed
      */
-    public function addJob($job);
+    public function addResource(Resource $resource);
 
     /**
      * @return mixed
