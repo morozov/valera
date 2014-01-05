@@ -1,16 +1,15 @@
 <?php
 
 namespace Valera;
-use Valera\ContentInterface;
-use Valera\ResourceInterface;
+use Valera\Resource;
 
-class Content implements ContentInterface
+class Content
 {
 
     protected $content;
     protected $resource;
 
-    public function __construct($content, ResourceInterface $resource)
+    public function __construct($content, Resource $resource)
     {
         if (!is_string($content)) {
             throw new \InvalidArgumentException(

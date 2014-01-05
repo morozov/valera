@@ -1,7 +1,6 @@
 <?php
 
 namespace Valera\Fetch;
-use Valera\ResourceInterface;
 use Valera\Resource;
 
 abstract class HttpClient  implements Worker
@@ -47,10 +46,10 @@ abstract class HttpClient  implements Worker
     }
 
     /**
-     * @param \Valera\Resource|\Valera\ResourceInterface $resource
+     * @param \Valera\Resource $resource
      * @return mixed
      */
-    public function addResource(ResourceInterface $resource)
+    public function addResource(Resource $resource)
     {
         if (Resource::METHOD_GET === $resource->getMethod()) {
             $this->getResources[$resource->getUrl()] = $resource;

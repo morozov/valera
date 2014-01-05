@@ -18,8 +18,10 @@ class Resource implements Serializable
     private $headers;
     private $data;
     private $hash;
+    private $type;
 
     /**
+     * @param $type string Resource type
      * @param $url string URL of the resource
      * @param string $method HTTP method to fetch resource
      * @param array $headers
@@ -27,11 +29,18 @@ class Resource implements Serializable
      * @throws \InvalidArgumentException
      */
     public function __construct(
+        $type,
         $url,
         $method = self::METHOD_GET,
         array $headers = array(),
         array $data = array()
     ) {
+        if (!is_string($type)) {
+            throw new \InvalidArgumentException(
+                sprintf('Type should be a string, %s given', gettype($url))
+            );
+        }
+
         if (!is_string($url)) {
             throw new \InvalidArgumentException(
                 sprintf('URL should be a string, %s given', gettype($url))
@@ -71,6 +80,14 @@ class Resource implements Serializable
     }
 
     /**
+     * Returns type of the resource
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
      * Returns resource URL
      * @return string
      */
@@ -103,7 +120,6 @@ class Resource implements Serializable
     }
 
     /**
-     * (PHP 5 &gt;= 5.1.0)<br/>
      * String representation of object
      * @link http://php.net/manual/en/serializable.serialize.php
      * @return string the string representation of the object or null
@@ -133,7 +149,6 @@ class Resource implements Serializable
     }
 
     /**
-     * (PHP 5 &gt;= 5.1.0)<br/>
      * Constructs the object
      * @link http://php.net/manual/en/serializable.unserialize.php
      * @param string $serialized <p>
