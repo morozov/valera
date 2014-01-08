@@ -12,7 +12,7 @@ if (!file_exists($autoload)) {
 
 require $autoload;
 
-$client = new \Valera\Fetch\CurlClient();
+$client = new \Valera\Worker\CurlClient();
 
 $google = new \Valera\Resource('page', 'http://google.com');
 $yandex = new \Valera\Resource('page', 'http://yandex.by');
@@ -26,7 +26,7 @@ $callback = function (\Valera\Response $response) {
 
 $client->setSuccessCallback($callback);
 
-$client->addResource($google)
-       ->addResource($yandex)
-       ->addResource($bing)
-       ->fetch();
+$client->addJob($google)
+       ->addJob($yandex)
+       ->addJob($bing)
+       ->run();

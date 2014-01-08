@@ -29,4 +29,9 @@ class Content
     {
         return $this->resource;
     }
+
+    public function getType()
+    {
+        return $this->getResource()->getType();
+    }
 }

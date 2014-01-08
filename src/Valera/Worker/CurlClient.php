@@ -1,6 +1,6 @@
 <?php
 
-namespace Valera\Fetch;
+namespace Valera\Worker;
 use Valera\Content;
 use Valera\Resource;
 use RollingCurl\RollingCurl;
@@ -44,7 +44,7 @@ class CurlClient extends HttpClient
     /**
      * @return mixed
      */
-    public function fetch()
+    public function run()
     {
         $rollingCurl = new RollingCurl();
         if (!empty($this->options)) {
