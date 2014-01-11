@@ -19,8 +19,7 @@
     "files": ["src/bootstrap.php"]
   },
   "require": {
-    "chuyskywalker/rolling-curl": "*",
-    "doctrine/dbal": "2.3.*",
-    "php": ">=5.4"
+    "php": ">=5.4",
+    "chuyskywalker/rolling-curl": "2.0.*"
   }
 }
