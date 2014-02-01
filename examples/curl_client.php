@@ -21,7 +21,7 @@ $bing = new \Valera\Resource('page', 'http://bing.com');
 $callback = function (\Valera\Response $response) {
     $content = new \Valera\Content(strval($response->getContent()), $response->getResource());
     $text = $content->getContent();
-    printf("Fetched %s, strlen=%s\n", $content->getResource()->getUrl(), mb_strlen($content->getContent()));
+    printf("Fetched %s, strlen=%s\n", $content->getResource()->getUrl(), mb_strlen($text));
 };
 
 $client->setSuccessCallback($callback);
