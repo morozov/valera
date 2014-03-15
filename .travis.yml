@@ -1,0 +1,13 @@
+language: php
+php:
+  - 5.4
+  - 5.5
+services:
+  - mongodb
+before_script:
+  - phpenv config-add travis/mongo.ini
+  - composer install
+  - mysql -e 'create database myapp_test;'
+  - mysql myapp_test < data/mysql.sql
+  - sqlite3 /tmp/myapp_test.db < data/sqlite.sql
+  - cp travis/tests/config.php tests/config.php

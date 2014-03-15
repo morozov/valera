@@ -30,13 +30,6 @@ class Pdo implements ResourceQueue
         $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
     }
 
-    /**
-     * Creates the necessary database schema
-     */
-    public function setUp()
-    {
-    }
-
     /** @inheritDoc */
     public function enqueue(Resource $resource)
     {

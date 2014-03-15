@@ -120,7 +120,7 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      * @depends enqueue
-     * @expectedException Valera\ResourceQueue\Exception\LogicException
+     * @expectedException \Valera\ResourceQueue\Exception\LogicException
      */
     public function resolveNotInProgress()
     {

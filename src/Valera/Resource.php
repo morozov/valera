@@ -35,9 +35,9 @@ class Resource implements Serializable
         array $headers = array(),
         array $data = array()
     ) {
-        if (!is_string($type)) {
+        if ($type !== null && !is_string($type)) {
             throw new \InvalidArgumentException(
-                sprintf('Type should be a string, %s given', gettype($url))
+                sprintf('Type should be a string or NULL, %s given', gettype($url))
             );
         }
 
@@ -120,18 +120,21 @@ class Resource implements Serializable
     }
 
     /**
-     * String representation of object
-     * @link http://php.net/manual/en/serializable.serialize.php
-     * @return string the string representation of the object or null
+     * Returns array representing object state
+     *
+     * @return array
      */
-    public function serialize()
+    public function toArray()
     {
-        $params = array(
-            'url' => $this->getUrl(),
-        );
+        $type = $this->getType();
+        if ($type !== null) {
+            $params['type'] = $type;
+        }
+
+        $params['url'] = $this->getUrl();
 
         $method = $this->getMethod();
-        if ($method != self::METHOD_GET) {
+        if ($method !== self::METHOD_GET) {
             $params['method'] = $method;
         }
 
@@ -145,6 +148,51 @@ class Resource implements Serializable
             $params['data'] = $data;
         }
 
+        return $params;
+    }
+
+    public static function fromArray(array $params)
+    {
+        if (isset($params['type'])) {
+            $type = $params['type'];
+        } else {
+            $type = null;
+        }
+
+        if (!isset($params['url'])) {
+            throw new \Exception('efwef');
+        }
+        $url = $params['url'];
+
+        if (isset($params['method'])) {
+            $method = $params['method'];
+        } else {
+            $method = self::METHOD_GET;
+        }
+
+        if (isset($params['headers'])) {
+            $headers = $params['headers'];
+        } else {
+            $headers = array();
+        }
+
+        if (isset($params['data'])) {
+            $data = $params['data'];
+        } else {
+            $data = array();
+        }
+
+        return new self($type, $url, $method, $headers, $data);
+    }
+
+    /**
+     * String representation of object
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
+     */
+    public function serialize()
+    {
+        $params = $this->toArray();
         return serialize($params);
     }
 
