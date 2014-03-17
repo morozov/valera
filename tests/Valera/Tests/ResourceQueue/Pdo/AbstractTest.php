@@ -1,9 +1,9 @@
 <?php
 
-namespace Valera\Tests\ResourceQueue\Pdo;
+namespace Valera\Tests\Queue\Pdo;
 
-use Valera\ResourceQueue\Pdo as Queue;
-use Valera\Tests\ResourceQueue\AbstractTest as Base;
+use Valera\Queue\Pdo as Queue;
+use Valera\Tests\Queue\AbstractTest as Base;
 
 /**
  * @requires extension pdo

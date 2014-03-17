@@ -1,8 +1,8 @@
 <?php
 
-namespace Valera\Tests\ResourceQueue;
+namespace Valera\Tests\Queue;
 
-use Valera\ResourceQueue\InMemory as Queue;
+use Valera\Queue\InMemory as Queue;
 
 class InMemoryTest extends AbstractTest
 {

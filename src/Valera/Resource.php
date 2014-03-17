@@ -8,7 +8,7 @@ use Serializable;
  * Class Resource
  * @package Valera
  */
-class Resource implements Serializable
+class Resource implements Queueable, Serializable
 {
     const METHOD_GET = 'GET';
     const METHOD_POST = 'POST';

@@ -1,11 +1,11 @@
 <?php
 
-namespace Valera\ResourceQueue;
+namespace Valera\Queue;
 
 /**
  * Queue exception interface
  *
- * @package Valera\ResourceQueue
+ * @package Valera\Queue
  */
 interface Exception
 {
