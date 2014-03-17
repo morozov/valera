@@ -1,20 +1,20 @@
 <?php
 
-namespace Valera\ResourceQueue;
+namespace Valera\Queue;
 
 use PDOException;
 use PDOStatement;
-use Valera\Resource;
-use Valera\ResourceQueue;
-use Valera\ResourceQueue\Exception\LogicException;
-use Valera\ResourceQueue\Exception\RuntimeException;
+use Valera\Queueable;
+use Valera\Queue;
+use Valera\Queue\Exception\LogicException;
+use Valera\Queue\Exception\RuntimeException;
 
 /**
- * Relational database implementation of resource queue
+ * Relational database implementation of item queue
  *
- * @package Valera\ResourceQueue
+ * @package Valera\Queue
  */
-class Pdo implements ResourceQueue
+class Pdo implements Queue
 {
     /**
      * @var \PDO
@@ -38,9 +38,9 @@ class Pdo implements ResourceQueue
     }
 
     /** @inheritDoc */
-    public function enqueue(Resource $resource)
+    public function enqueue(Queueable $item)
     {
-        $this->ensureResourceRegistered($resource);
+        $this->ensureItemRegistered($item);
 
         $query = <<<QUERY
 INSERT INTO resource_queue (resource_hash)
@@ -51,7 +51,7 @@ WHERE NOT EXISTS (
 QUERY;
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindValue(':resource_hash', $resource->getHash());
+        $stmt->bindValue(':resource_hash', $item->getHash());
         $stmt->execute();
     }
 
@@ -72,29 +72,29 @@ QUERY;
         $stmt->execute();
 
         if ($stmt->fetch(\PDO::FETCH_BOUND)) {
-            $resource = unserialize($data);
-            $this->removeFromCollection($resource, 'resource_queue');
-            $this->addToCollection($resource, 'resource_in_progress');
-            return $resource;
+            $item = unserialize($data);
+            $this->removeFromCollection($item, 'resource_queue');
+            $this->addToCollection($item, 'resource_in_progress');
+            return $item;
         }
 
         return null;
     }
 
     /** @inheritDoc */
-    public function resolveCompleted(Resource $resource)
+    public function resolveCompleted(Queueable $item)
     {
-        $this->ensureInCollection($resource, 'resource_in_progress');
-        $this->removeFromCollection($resource, 'resource_in_progress');
-        $this->addToCollection($resource, 'resource_completed');
+        $this->ensureInCollection($item, 'resource_in_progress');
+        $this->removeFromCollection($item, 'resource_in_progress');
+        $this->addToCollection($item, 'resource_completed');
     }
 
     /** @inheritDoc */
-    public function resolveFailed(Resource $resource)
+    public function resolveFailed(Queueable $item)
     {
-        $this->ensureInCollection($resource, 'resource_in_progress');
-        $this->removeFromCollection($resource, 'resource_in_progress');
-        $this->addToCollection($resource, 'resource_failed');
+        $this->ensureInCollection($item, 'resource_in_progress');
+        $this->removeFromCollection($item, 'resource_in_progress');
+        $this->addToCollection($item, 'resource_failed');
     }
 
     /** {@inheritDoc} */
@@ -140,7 +140,7 @@ QUERY;
         return $count;
     }
 
-    protected function ensureResourceRegistered(Resource $resource)
+    protected function ensureItemRegistered(Queueable $item)
     {
         $query = <<<QUERY
 INSERT INTO resource (hash, data)
@@ -151,8 +151,8 @@ WHERE NOT EXISTS (
 QUERY;
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindValue(':hash', $resource->getHash());
-        $stmt->bindValue(':data', serialize($resource));
+        $stmt->bindValue(':hash', $item->getHash());
+        $stmt->bindValue(':data', serialize($item));
         $stmt->execute();
     }
 
@@ -168,15 +168,15 @@ QUERY;
         $stmt->bindColumn(1, $data);
         $stmt->execute();
 
-        $resources = array();
+        $items = array();
         while ($stmt->fetch(\PDO::FETCH_BOUND)) {
-            $resources[] = unserialize($data);
+            $items[] = unserialize($data);
         }
 
-        return $resources;
+        return $items;
     }
 
-    protected function addToCollection(Resource $resource, $table)
+    protected function addToCollection(Queueable $item, $table)
     {
         $query = <<<QUERY
 INSERT INTO $table(resource_hash)
@@ -184,11 +184,11 @@ VALUES(:resource_hash)
 QUERY;
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindValue(':resource_hash', $resource->getHash());
+        $stmt->bindValue(':resource_hash', $item->getHash());
         $stmt->execute();
     }
 
-    protected function removeFromCollection(Resource $resource, $table)
+    protected function removeFromCollection(Queueable $item, $table)
     {
         $query = <<<QUERY
 DELETE FROM $table
@@ -196,11 +196,11 @@ WHERE resource_hash = :resource_hash
 QUERY;
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindValue(':resource_hash', $resource->getHash());
+        $stmt->bindValue(':resource_hash', $item->getHash());
         $stmt->execute();
     }
 
-    protected function ensureInCollection(Resource $resource, $table)
+    protected function ensureInCollection(Queueable $item, $table)
     {
         $query = <<<QUERY
 SELECT resource_hash
@@ -209,11 +209,11 @@ WHERE resource_hash = :resource_hash
 QUERY;
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindValue(':resource_hash', $resource->getHash());
+        $stmt->bindValue(':resource_hash', $item->getHash());
         $stmt->execute();
 
         if (!$stmt->fetch()) {
-            throw new LogicException('Resource is not in progress');
+            throw new LogicException('Item is not in progress');
         }
     }
 

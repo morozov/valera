@@ -1,6 +1,6 @@
 <?php
 
-namespace Valera\Tests\ResourceQueue\Pdo;
+namespace Valera\Tests\Queue\Pdo;
 
 /**
  * @requires extension pdo_mysql

@@ -1,13 +1,13 @@
 <?php
 
-namespace Valera\ResourceQueue\Exception;
+namespace Valera\Queue\Exception;
 
-use Valera\ResourceQueue\Exception;
+use Valera\Queue\Exception;
 
 /**
  * Queue logic exception
  *
- * @package Valera\ResourceQueue
+ * @package Valera\Queue
  */
 class LogicException extends \LogicException implements Exception
 {

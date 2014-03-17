@@ -1,19 +1,19 @@
 <?php
 
-namespace Valera\ResourceQueue;
+namespace Valera\Queue;
 
 use ArrayIterator;
 use SplQueue;
-use Valera\Resource;
-use Valera\ResourceQueue;
-use Valera\ResourceQueue\Exception\LogicException;
+use Valera\Queueable;
+use Valera\Queue;
+use Valera\Queue\Exception\LogicException;
 
 /**
- * In-memory implementation of resource queue
+ * In-memory implementation of queue
  *
- * @package Valera\ResourceQueue
+ * @package Valera\Queue
  */
-class InMemory implements ResourceQueue
+class InMemory implements Queue
 {
     /**
      * Underlying queue
@@ -30,21 +30,21 @@ class InMemory implements ResourceQueue
     protected $index;
 
     /**
-     * Resources in progress
+     * Items in progress
      *
      * @var array
      */
     protected $inProgress = array();
 
     /**
-     * Successfully processed resources
+     * Successfully processed items
      *
      * @var array
      */
     protected $completed = array();
 
     /**
-     * Unsuccessfully processed resources
+     * Unsuccessfully processed items
      *
      * @var array
      */
@@ -59,9 +59,9 @@ class InMemory implements ResourceQueue
     }
 
     /** @inheritDoc */
-    public function enqueue(Resource $resource)
+    public function enqueue(Queueable $item)
     {
-        $hash = $resource->getHash();
+        $hash = $item->getHash();
 
         if (isset($this->index[$hash])
             || isset($this->inProgress[$hash])
@@ -72,7 +72,7 @@ class InMemory implements ResourceQueue
         }
 
         $this->index[$hash] = true;
-        $this->queue->enqueue($resource);
+        $this->queue->enqueue($item);
     }
 
     /** @inheritDoc */
@@ -82,28 +82,28 @@ class InMemory implements ResourceQueue
             return null;
         }
 
-        $resource = $this->queue->dequeue();
-        $hash = $resource->getHash();
+        $item = $this->queue->dequeue();
+        $hash = $item->getHash();
 
-        $this->inProgress[$hash] = $resource;
+        $this->inProgress[$hash] = $item;
 
-        return $resource;
+        return $item;
     }
 
     /** @inheritDoc */
-    public function resolveCompleted(Resource $resource)
+    public function resolveCompleted(Queueable $item)
     {
-        $hash = $resource->getHash();
+        $hash = $item->getHash();
         $this->stopProgress($hash);
-        $this->completed[$hash] = $resource;
+        $this->completed[$hash] = $item;
     }
 
     /** @inheritDoc */
-    public function resolveFailed(Resource $resource)
+    public function resolveFailed(Queueable $item)
     {
-        $hash = $resource->getHash();
+        $hash = $item->getHash();
         $this->stopProgress($hash);
-        $this->failed[$hash] = $resource;
+        $this->failed[$hash] = $item;
     }
 
     /** {@inheritDoc} */
@@ -146,16 +146,16 @@ class InMemory implements ResourceQueue
     }
 
     /**
-     * Marks resource with the given hash as not in progress.
+     * Marks item with the given hash as not in progress.
      *
      * Throws exception in case if it's not currently in progress.
      *
-     * @throws \Valera\ResourceQueue\Exception\LogicException
+     * @throws \Valera\Queue\Exception\LogicException
      */
     protected function stopProgress($hash)
     {
         if (!isset($this->inProgress[$hash])) {
-            throw new LogicException('Resource is not in progress');
+            throw new LogicException('Item is not in progress');
         }
         unset($this->inProgress[$hash]);
     }

@@ -1,14 +1,14 @@
 <?php
 
-namespace Valera\Tests\ResourceQueue;
+namespace Valera\Tests\Queue;
 
 use Valera\Resource;
-use Valera\ResourceQueue;
+use Valera\Queue;
 
 abstract class AbstractTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Valera\ResourceQueue
+     * @var \Valera\Queue
      */
     protected static $queue;
 
@@ -120,7 +120,7 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      * @depends enqueue
-     * @expectedException Valera\ResourceQueue\Exception\LogicException
+     * @expectedException Valera\Queue\Exception\LogicException
      */
     public function resolveNotInProgress()
     {
