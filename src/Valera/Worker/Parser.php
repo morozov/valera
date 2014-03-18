@@ -2,6 +2,7 @@
 namespace Valera\Worker;
 
 use Valera\Content;
+use Valera\Resource;
 use Valera\Worker\ParserFactoryInterface;
 
 /**
@@ -115,5 +116,9 @@ class Parser implements WorkerInterface
     {
         $parser = $this->factory->getParser($content->getType());
         return $parser($content->getContent());
+    }
+
+    public function addResource(Resource $resource)
+    {
     }
 }

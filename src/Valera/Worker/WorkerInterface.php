@@ -1,6 +1,8 @@
 <?php
 namespace Valera\Worker;
 
+use Valera\Resource;
+
 interface WorkerInterface
 {
     /**
