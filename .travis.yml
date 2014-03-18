@@ -2,9 +2,12 @@ language: php
 php:
   - 5.4
   - 5.5
+services:
+  - mongodb
 before_script:
+  - phpenv config-add travis/mongo.ini
   - composer install
   - mysql -e 'create database myapp_test;'
   - mysql myapp_test < data/mysql.sql
   - sqlite3 /tmp/myapp_test.db < data/sqlite.sql
-  - echo '<?php define("VALERA_TESTS_MYSQL_DSN", "mysql:dbname=myapp_test"); define("VALERA_TESTS_MYSQL_USERNAME", "travis"); define("VALERA_TESTS_MYSQL_PASSWORD", ""); define("VALERA_TESTS_SQLITE_DSN", "sqlite:/tmp/myapp_test.db");' > tests/config.php
+  - cp travis/tests/config.php tests/config.php

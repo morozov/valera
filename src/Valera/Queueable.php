@@ -10,4 +10,11 @@ interface Queueable
      * @return string
      */
     public function getHash();
+    
+    /**
+     * Returns array representing object state
+     *
+     * @return array
+     */
+    public function toArray();
 }
