@@ -9,7 +9,24 @@ use Valera\Resource;
 
 class Success implements ResultInterface, IteratorAggregate, Countable
 {
-    protected $resources = array();
+    /**
+     * Parsed data
+     *
+     * @var mixed
+     */
+    private $data;
+
+    /**
+     * Additional resources to be parsed
+     *
+     * @var \Valera\Resource[]
+     */
+    private $resources = array();
+
+    public function __construct($data)
+    {
+        $this->data = $data;
+    }
 
     public function addResource(
         $type,
@@ -19,6 +36,14 @@ class Success implements ResultInterface, IteratorAggregate, Countable
         array $data = array()
     ) {
         $this->resources[] = new Resource($type, $url, $method, $headers, $data);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getData()
+    {
+        return $this->data;
     }
 
     /**
