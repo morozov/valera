@@ -2,10 +2,19 @@
 
 namespace Valera\Parser;
 
+use \UnexpectedValueException;
+
 class Factory implements FactoryInterface
 {
     protected $parsers = array();
     protected $namespaces = array();
+
+    public function __construct(array $namespaces = array())
+    {
+        foreach ($namespaces as $namespace) {
+            $this->registerNamespace($namespace);
+        }
+    }
 
     /** {@inheritDoc} */
     public function getParser($type)
@@ -16,6 +25,12 @@ class Factory implements FactoryInterface
 
         $parser = $this->loadParser($type);
         if ($parser) {
+            if (!$parser instanceof ParserInterface) {
+                throw new UnexpectedValueException(
+                    'Parser class is loaded but doesn\'t implement the'
+                    . ' ParserInterface'
+                );
+            }
             $this->parsers[$type] = $parser;
         }
 
@@ -29,8 +44,8 @@ class Factory implements FactoryInterface
 
     protected function loadParser($type)
     {
-        foreach ($this->namespaces as $namespace) {
-            $class = $namespace . '\\' . $type;
+        foreach (array_keys($this->namespaces) as $namespace) {
+            $class = $namespace . '\\' . ucfirst($type);
             if (class_exists($class)) {
                 return new $class;
             }

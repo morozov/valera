@@ -27,6 +27,24 @@ class Proxy
         $this->result = new Failure($message);
     }
 
+    /**
+     * @return ResultInterface
+     * @throws \LogicException
+     */
+    public function getResult()
+    {
+        if (!$this->result) {
+            throw new LogicException(
+                'Result is not yet resolved'
+            );
+        }
+
+        return $this->result;
+    }
+
+    /**
+     * @throws \LogicException
+     */
     protected function ensureUnresolved()
     {
         if ($this->result) {

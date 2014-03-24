@@ -10,6 +10,7 @@ interface FactoryInterface
      * @param string $type Parser type
      *
      * @return \Valera\Parser\ParserInterface
+     * @throws \UnexpectedValueException
      */
     public function getParser($type);
 }
