@@ -2,6 +2,7 @@
 
 namespace Valera\Queue;
 
+use MongoCursorException;
 use Valera\Queueable;
 use Valera\Resource;
 use Valera\Queue;
@@ -35,7 +36,7 @@ class Mongo implements Queue
                 '_id' => 'pending',
                 'seq' => 0,
             ]);
-        } catch (\MongoCursorException $e) {
+        } catch (MongoCursorException $e) {
             if ($e->getCode() !== 11000) {
                 throw $e;
             }
@@ -54,7 +55,7 @@ class Mongo implements Queue
                 'seq' => $this->getNextSequence('pending'),
                 'data' => $item->toArray(),
             ]);
-        } catch (\MongoCursorException $e) {
+        } catch (MongoCursorException $e) {
             if ($e->getCode() !== 11000) {
                 throw $e;
             }
