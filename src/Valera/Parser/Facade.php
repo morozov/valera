@@ -1,10 +1,8 @@
 <?php
 
-namespace Valera\Worker;
+namespace Valera\Parser;
 
 use Valera\Content;
-use Valera\Parser\FactoryInterface;
-use Valera\Parser\ParserInterface;
 use Valera\Parser\Result\Proxy as Result;
 
 class Facade implements ParserInterface
@@ -26,14 +24,13 @@ class Facade implements ParserInterface
     {
         $type = $content->getType();
         $parser = $this->factory->getParser($type);
-        if (!$parser) {
+        if ($parser) {
+            $parser->parse($content, $result);
+        } else {
             $result->fail(sprintf(
                 'Unable to load parser of type %s',
                 $type
             ));
-            return;
         }
-
-        $parser->parse($content, $result);
     }
 }
