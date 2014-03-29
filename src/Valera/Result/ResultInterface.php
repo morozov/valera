@@ -1,6 +1,6 @@
 <?php
 
-namespace Valera\Parser\Result;
+namespace Valera\Result;
 
 interface ResultInterface
 {

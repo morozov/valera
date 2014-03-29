@@ -6,27 +6,16 @@ use ArrayIterator;
 use Countable;
 use IteratorAggregate;
 use Valera\Resource;
+use Valera\Result\Success as BaseSuccess;
 
-class Success implements ResultInterface, IteratorAggregate, Countable
+class Success extends BaseSuccess implements IteratorAggregate, Countable
 {
-    /**
-     * Parsed data
-     *
-     * @var mixed
-     */
-    private $data;
-
     /**
      * Additional resources to be parsed
      *
      * @var \Valera\Resource[]
      */
-    private $resources = array();
-
-    public function __construct($data)
-    {
-        $this->data = $data;
-    }
+    protected $resources = array();
 
     public function addResource(
         $type,
@@ -36,14 +25,6 @@ class Success implements ResultInterface, IteratorAggregate, Countable
         array $data = array()
     ) {
         $this->resources[] = new Resource($type, $url, $method, $headers, $data);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getData()
-    {
-        return $this->data;
     }
 
     /**

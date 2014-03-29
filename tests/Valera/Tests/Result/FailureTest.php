@@ -1,11 +1,11 @@
 <?php
 
-namespace Valera\Tests\Parser\Result;
+namespace Valera\Tests\Result;
 
-use Valera\Parser\Result\Failure;
+use Valera\Result\Failure;
 
 /**
- * @covers \Valera\Parser\Result\Failure
+ * @covers \Valera\Result\Failure
  */
 class FailureTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,8 +19,8 @@ class FailureTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testNonStringMessageIsRejected()
+    public function testMessageOfWrongTypeIsRejected()
     {
-        new Failure(null);
+        new Failure(array());
     }
 }

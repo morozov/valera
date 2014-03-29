@@ -10,12 +10,12 @@ use Valera\Parser\Result\Proxy as Result;
 class Facade implements ParserInterface
 {
     /**
-     * @var
+     * @var FactoryInterface
      */
     protected $factory;
 
     /**
-     * @param $factory
+     * @param FactoryInterface $factory
      */
     public function __construct(FactoryInterface $factory)
     {

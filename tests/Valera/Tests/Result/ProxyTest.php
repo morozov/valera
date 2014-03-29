@@ -1,17 +1,15 @@
 <?php
 
-namespace Valera\Tests\Parser\Result;
+namespace Valera\Tests\Result;
 
-use Valera\Parser\Result\Failure;
-use Valera\Parser\Result\Proxy;
-use Valera\Parser\Result\Success;
+use Valera\Result\Proxy;
 
 /**
- * @covers \Valera\Parser\Result\Proxy
+ * @covers \Valera\Proxy
  */
 class ProxyTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \Valera\Parser\Result\Proxy */
+    /** @var \Valera\Result\Proxy */
     private $proxy;
 
     protected function setUp()
@@ -24,7 +22,7 @@ class ProxyTest extends \PHPUnit_Framework_TestCase
         $data = array('foo' => 'bar');
         $this->proxy->succeed($data);
 
-        /** @var Success $result */
+        /** @var \Valera\Result\Success $result */
         $result = $this->proxy->getResult();
         $this->assertEquals($data, $result->getData());
     }
@@ -34,7 +32,7 @@ class ProxyTest extends \PHPUnit_Framework_TestCase
         $message = 'Unable to find the title';
         $this->proxy->fail($message);
 
-        /** @var Failure $result */
+        /** @var \Valera\Result\Failure $result */
         $result = $this->proxy->getResult();
         $this->assertEquals($message, $result->getMessage());
     }

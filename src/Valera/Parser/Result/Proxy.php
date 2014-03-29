@@ -2,55 +2,17 @@
 
 namespace Valera\Parser\Result;
 
-use LogicException;
+use Valera\Result\Proxy as BaseProxy;
 
-class Proxy
+class Proxy extends BaseProxy
 {
     /**
-     * Actual value of the result
+     * @param mixed $data
      *
-     * @var \Valera\Parser\Result\ResultInterface
+     * @return Success
      */
-    protected $result;
-
-    public function succeed($data)
+    protected function getSuccess($data)
     {
-        $this->ensureUnresolved();
-        $this->result = new Success($data);
-
-        return $this->result;
-    }
-
-    public function fail($message)
-    {
-        $this->ensureUnresolved();
-        $this->result = new Failure($message);
-    }
-
-    /**
-     * @return ResultInterface
-     * @throws \LogicException
-     */
-    public function getResult()
-    {
-        if (!$this->result) {
-            throw new LogicException(
-                'Result is not yet resolved'
-            );
-        }
-
-        return $this->result;
-    }
-
-    /**
-     * @throws \LogicException
-     */
-    protected function ensureUnresolved()
-    {
-        if ($this->result) {
-            throw new LogicException(
-                'Result is already resolved'
-            );
-        }
+        return new Success($data);
     }
 }
