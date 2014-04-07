@@ -3,6 +3,7 @@
 namespace Valera\Tests\Queue;
 
 use Valera\Resource;
+use Valera\Source;
 use Valera\Queue;
 
 abstract class AbstractTest extends \PHPUnit_Framework_TestCase
@@ -13,22 +14,22 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
     protected static $queue;
 
     /**
-     * @var \Valera\Resource
+     * @var \Valera\Source
      */
-    protected static $r1;
+    protected static $s1;
 
     /**
-     * @var \Valera\Resource
+     * @var \Valera\Source
      */
-    protected static $r2;
+    protected static $s2;
 
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
         self::$queue->clean();
-        
-        self::$r1 = new Resource('index', 'http://example.com/');
-        self::$r2 = new Resource('index', 'http://example.org/');
+
+        self::$s1 = new Source(new Resource('http://example.com/'), '');
+        self::$s2 = new Source(new Resource('http://example.org/'), '');
     }
 
     protected function tearDown()
@@ -54,15 +55,15 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
     public function enqueue()
     {
         // resource is added to queue
-        self::$queue->enqueue(self::$r1);
+        self::$queue->enqueue(self::$s1);
         $this->assertCount(1, self::$queue);
 
         // queued resource is ignored
-        self::$queue->enqueue(self::$r1);
+        self::$queue->enqueue(self::$s1);
         $this->assertCount(1, self::$queue);
 
         // another resource is added
-        self::$queue->enqueue(self::$r2);
+        self::$queue->enqueue(self::$s2);
         $this->assertCount(2, self::$queue);
     }
 
@@ -72,22 +73,22 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
      */
     public function dequeue()
     {
-        self::$queue->enqueue(self::$r1);
-        self::$queue->enqueue(self::$r2);
+        self::$queue->enqueue(self::$s1);
+        self::$queue->enqueue(self::$s2);
 
-        $r1 = self::$queue->dequeue();
-        $this->assertContains($r1, self::$queue->getInProgress(), '', false, false);
+        $s1 = self::$queue->dequeue();
+        $this->assertContains($s1, self::$queue->getInProgress(), '', false, false);
 
-        self::$queue->resolveCompleted($r1);
-        $this->assertNotContains($r1, self::$queue->getInProgress(), '', false, false);
-        $this->assertNotContains($r1, self::$queue->getFailed(), '', false, false);
-        $this->assertContains($r1, self::$queue->getCompleted(), '', false, false);
+        self::$queue->resolveCompleted($s1);
+        $this->assertNotContains($s1, self::$queue->getInProgress(), '', false, false);
+        $this->assertNotContains($s1, self::$queue->getFailed(), '', false, false);
+        $this->assertContains($s1, self::$queue->getCompleted(), '', false, false);
 
-        $r2 = self::$queue->dequeue();
-        self::$queue->resolveFailed($r2);
-        $this->assertNotContains($r2, self::$queue->getInProgress(), '', false, false);
-        $this->assertNotContains($r2, self::$queue->getCompleted(), '', false, false);
-        $this->assertContains($r2, self::$queue->getFailed(), '', false, false);
+        $s2 = self::$queue->dequeue();
+        self::$queue->resolveFailed($s2);
+        $this->assertNotContains($s2, self::$queue->getInProgress(), '', false, false);
+        $this->assertNotContains($s2, self::$queue->getCompleted(), '', false, false);
+        $this->assertContains($s2, self::$queue->getFailed(), '', false, false);
     }
 
     /**
@@ -97,14 +98,14 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
      */
     public function queuePreservesOrder()
     {
-        self::$queue->enqueue(self::$r1);
-        self::$queue->enqueue(self::$r2);
+        self::$queue->enqueue(self::$s1);
+        self::$queue->enqueue(self::$s2);
 
         $current = self::$queue->dequeue();
-        $this->assertTrue(self::$r1->equals($current));
+        $this->assertEquals(self::$s1->getHash(), $current->getHash());
 
         $current = self::$queue->dequeue();
-        $this->assertTrue(self::$r2->equals($current));
+        $this->assertEquals(self::$s2->getHash(), $current->getHash());
     }
 
     /**
@@ -124,7 +125,7 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
      */
     public function resolveNotInProgress()
     {
-        self::$queue->enqueue(self::$r1);
-        self::$queue->resolveCompleted(self::$r1);
+        self::$queue->enqueue(self::$s1);
+        self::$queue->resolveCompleted(self::$s1);
     }
 }

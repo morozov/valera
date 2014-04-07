@@ -2,13 +2,14 @@
 
 namespace Valera;
 
-use Serializable;
+use Valera\Serialize\Serializable;
+use Valera\Serialize\Serializer;
 
 /**
  * Class Resource
  * @package Valera
  */
-class Resource implements Queueable, Serializable
+class Resource implements Serializable
 {
     const METHOD_GET = 'GET';
     const METHOD_POST = 'POST';
@@ -18,10 +19,8 @@ class Resource implements Queueable, Serializable
     private $headers;
     private $data;
     private $hash;
-    private $type;
 
     /**
-     * @param $type string Resource type
      * @param $url string URL of the resource
      * @param string $method HTTP method to fetch resource
      * @param array $headers
@@ -29,18 +28,11 @@ class Resource implements Queueable, Serializable
      * @throws \InvalidArgumentException
      */
     public function __construct(
-        $type,
         $url,
         $method = self::METHOD_GET,
         array $headers = array(),
         array $data = array()
     ) {
-        if ($type !== null && !is_string($type)) {
-            throw new \InvalidArgumentException(
-                sprintf('Type should be a string or NULL, %s given', gettype($url))
-            );
-        }
-
         if (!is_string($url)) {
             throw new \InvalidArgumentException(
                 sprintf('URL should be a string, %s given', gettype($url))
@@ -80,14 +72,6 @@ class Resource implements Queueable, Serializable
     }
 
     /**
-     * Returns type of the resource
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
      * Returns resource URL
      * @return string
      */
@@ -119,46 +103,8 @@ class Resource implements Queueable, Serializable
         return $this->data;
     }
 
-    /**
-     * Returns array representing object state
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        $type = $this->getType();
-        if ($type !== null) {
-            $params['type'] = $type;
-        }
-
-        $params['url'] = $this->getUrl();
-
-        $method = $this->getMethod();
-        if ($method !== self::METHOD_GET) {
-            $params['method'] = $method;
-        }
-
-        $headers = $this->getHeaders();
-        if ($headers) {
-            $params['headers'] = $headers;
-        }
-
-        $data = $this->getData();
-        if ($data) {
-            $params['data'] = $data;
-        }
-
-        return $params;
-    }
-
     public static function fromArray(array $params)
     {
-        if (isset($params['type'])) {
-            $type = $params['type'];
-        } else {
-            $type = null;
-        }
-
         if (!isset($params['url'])) {
             throw new \Exception('efwef');
         }
@@ -182,48 +128,7 @@ class Resource implements Queueable, Serializable
             $data = array();
         }
 
-        return new self($type, $url, $method, $headers, $data);
-    }
-
-    /**
-     * String representation of object
-     * @link http://php.net/manual/en/serializable.serialize.php
-     * @return string the string representation of the object or null
-     */
-    public function serialize()
-    {
-        $params = $this->toArray();
-        return serialize($params);
-    }
-
-    /**
-     * Constructs the object
-     * @link http://php.net/manual/en/serializable.unserialize.php
-     * @param string $serialized <p>
-     * The string representation of the object.
-     * </p>
-     * @return void
-     */
-    public function unserialize($serialized)
-    {
-        $params = unserialize($serialized);
-        $this->url = $params['url'];
-
-        if (isset($params['method'])) {
-            $this->method = $params['method'];
-        } else {
-            $this->method = self::METHOD_GET;
-        }
-
-        if (isset($params['headers'])) {
-            $this->headers = $params['headers'];
-        }
-
-        if (isset($params['data'])) {
-            $this->data = $params['data'];
-        }
-
-        $this->hash();
+        return new self($url, $method, $headers, $data);
     }
 
     /**
@@ -234,8 +139,8 @@ class Resource implements Queueable, Serializable
     public function equals(Resource $resource)
     {
         return $resource->getUrl() === $this->getUrl()
-            && $resource->getMethod() === $this->getMethod()
-            && $resource->getHeaders() == $this->getHeaders();
+        && $resource->getMethod() === $this->getMethod()
+        && $resource->getHeaders() == $this->getHeaders();
     }
 
     /**
@@ -254,5 +159,10 @@ class Resource implements Queueable, Serializable
     protected function hash()
     {
         $this->hash = md5(serialize($this));
+    }
+
+    public function accept(Serializer $serializer)
+    {
+        return $serializer->serializeResource($this);
     }
 }

@@ -4,12 +4,13 @@ namespace Valera\Queue;
 
 use MongoCursorException;
 use Valera\Queueable;
-use Valera\Resource;
 use Valera\Queue;
 use Valera\Queue\Exception\LogicException;
+use Valera\Serialize\Serializer;
+use Valera\Source;
 
 /**
- * MongoDB implementation of resource queue
+ * MongoDB implementation of queue
  *
  * @package Valera\Queue
  */
@@ -19,13 +20,15 @@ class Mongo implements Queue
      * @var \MongoDB
      */
     protected $db;
+    protected $serializer;
 
     /**
      * Constructor
      */
-    public function __construct(\MongoDB $db)
+    public function __construct(\MongoDB $db, Serializer $serializer)
     {
         $this->db = $db;
+        $this->serializer = $serializer;
         $this->setUp();
     }
 
@@ -53,7 +56,7 @@ class Mongo implements Queue
             $this->db->pending->insert([
                 '_id' => $item->getHash(),
                 'seq' => $this->getNextSequence('pending'),
-                'data' => $item->toArray(),
+                'data' => $this->serialize($item),
             ]);
         } catch (MongoCursorException $e) {
             if ($e->getCode() !== 11000) {
@@ -91,12 +94,12 @@ class Mongo implements Queue
             return null;
         }
 
-        $resource = Resource::fromArray($ret['data']);
+        $item = Source::fromArray($ret['data']);
 
         /** @var \MongoCollection $pending */
-        $this->addToCollection($resource, 'in_progress');
+        $this->addToCollection($item, 'in_progress');
 
-        return $resource;
+        return $item;
     }
 
     /** @inheritDoc */
@@ -150,20 +153,20 @@ class Mongo implements Queue
 
     protected function getCollection($name)
     {
-        $resources = array();
+        $items = array();
         $collection = $this->db->$name->find();
         foreach ($collection as $document) {
-            $resources[] = Resource::fromArray($document['data']);
+            $items[] = Source::fromArray($document['data']);
         }
 
-        return $resources;
+        return $items;
     }
 
     protected function addToCollection(Queueable $item, $name)
     {
         $this->db->$name->insert([
             '_id' => $item->getHash(),
-            'data' => $item->toArray(),
+            'data' => $this->serialize($item),
         ]);
     }
 
@@ -179,7 +182,12 @@ class Mongo implements Queue
         );
         
         if (!$res) {
-            throw new LogicException('Resource is not in progress');
+            throw new LogicException('Item is not in progress');
         }
+    }
+
+    protected function serialize(Queueable $item)
+    {
+        return $this->serializer->serialize($item);
     }
 }

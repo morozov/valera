@@ -18,13 +18,12 @@ class Success extends BaseSuccess implements IteratorAggregate, Countable
     protected $resources = array();
 
     public function addResource(
-        $type,
         $url,
         $method = Resource::METHOD_GET,
         array $headers = array(),
         array $data = array()
     ) {
-        $this->resources[] = new Resource($type, $url, $method, $headers, $data);
+        $this->resources[] = new Resource($url, $method, $headers, $data);
     }
 
     /**

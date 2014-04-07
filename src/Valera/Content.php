@@ -1,15 +1,16 @@
 <?php
 
 namespace Valera;
-use Valera\Resource;
 
-class Content
+use Valera\Serialize\Serializer;
+
+class Content implements Queueable
 {
-
     protected $content;
+    protected $type;
     protected $resource;
 
-    public function __construct($content, Resource $resource)
+    public function __construct($content, $type, Resource $resource)
     {
         if (!is_string($content)) {
             throw new \InvalidArgumentException(
@@ -17,6 +18,7 @@ class Content
             );
         }
         $this->content = $content;
+        $this->type = $type;
         $this->resource = $resource;
     }
 
@@ -25,13 +27,28 @@ class Content
         return $this->content;
     }
 
+    public function getType()
+    {
+        return $this->type;
+    }
+
     public function getResource()
     {
         return $this->resource;
     }
 
-    public function getType()
+    /**
+     * Returns content hash
+     *
+     * @return string
+     */
+    public function getHash()
     {
-        return $this->getResource()->getType();
+        return $this->resource->getHash();
+    }
+
+    public function accept(Serializer $serializer)
+    {
+        return $serializer->serializeContent($this);
     }
 }

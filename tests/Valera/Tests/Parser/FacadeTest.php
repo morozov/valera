@@ -58,8 +58,8 @@ class FacadeTest extends \PHPUnit_Framework_TestCase
 
     private function getContent()
     {
-        $resource = new Resource(null, 'http://example.com/');
-        $content = new Content('', $resource);
+        $resource = new Resource('http://example.com/');
+        $content = new Content('', '', $resource);
 
         return $content;
     }

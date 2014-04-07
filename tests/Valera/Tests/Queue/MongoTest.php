@@ -3,6 +3,7 @@
 namespace Valera\Tests\Queue;
 
 use Valera\Queue\Mongo as Queue;
+use Valera\Serialize\ArraySerializer;
 
 /**
  * @requires extension mongo
@@ -24,7 +25,7 @@ class MongoTest extends AbstractTest
         }
 
         $db = $client->selectDB(VALERA_TESTS_MONGO_DB);
-        self::$queue = new Queue($db);
+        self::$queue = new Queue($db, new ArraySerializer());
 
         parent::setUpBeforeClass();
     }

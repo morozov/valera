@@ -17,11 +17,11 @@ class SuccessTest extends \PHPUnit_Framework_TestCase
         $u2 = 'http://example2.com';
 
         $success = new Success();
-        $success->addResource(null, $u1);
-        $success->addResource(null, $u2);
+        $success->addResource($u1);
+        $success->addResource($u2);
 
-        $r1 = new Resource(null, $u1);
-        $r2 = new Resource(null, $u2);
+        $r1 = new Resource($u1);
+        $r2 = new Resource($u2);
 
         $resources = $success->getResources();
         $this->assertCount(2, $resources);

@@ -2,7 +2,9 @@
 
 namespace Valera;
 
-interface Queueable
+use Valera\Serialize\Serializable;
+
+interface Queueable extends Serializable
 {
     /**
      * Returns queueable item hash
@@ -10,11 +12,4 @@ interface Queueable
      * @return string
      */
     public function getHash();
-    
-    /**
-     * Returns array representing object state
-     *
-     * @return array
-     */
-    public function toArray();
 }

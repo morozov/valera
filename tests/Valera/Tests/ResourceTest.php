@@ -9,7 +9,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
 
     public function testDefaults()
     {
-        $resource = new Resource('page','http://google.com');
+        $resource = new Resource('http://google.com');
         $this->assertEquals('http://google.com', $resource->getUrl());
         $this->assertEquals('GET', $resource->getMethod());
         $this->assertEquals(array(), $resource->getHeaders());
@@ -18,18 +18,18 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
 
     public function testEquals()
     {
-        $resource1 = new Resource('page', 'http://google.com');
-        $resource2 = new Resource('page', 'http://google.com');
+        $resource1 = new Resource('http://google.com');
+        $resource2 = new Resource('http://google.com');
 
         $this->assertTrue($resource1->equals($resource2));
         
-        $resource3 = new Resource('page', 'http://ya.ru', Resource::METHOD_POST);
+        $resource3 = new Resource('http://ya.ru', Resource::METHOD_POST);
         $this->assertFalse($resource1->equals($resource3));
     }
 
     public function testSerializable()
     {
-        $resource = new Resource('page', 'http://google.com');
+        $resource = new Resource('http://google.com');
         $serialized = serialize($resource);
         $resource2 = unserialize($serialized);
         $this->assertTrue($resource->equals($resource2));
@@ -40,7 +40,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
      */
     public function testBadUrlType()
     {
-        new Resource('page', 42);
+        new Resource(42);
     }
 
     /**
@@ -48,7 +48,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
      */
     public function testBadMethod()
     {
-        new Resource('page', 'http://url', 42);
+        new Resource('http://url', 42);
     }
 
     /**
@@ -56,6 +56,6 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidationFailed()
     {
-        new Resource('page', 'not an url');
+        new Resource('not an url');
     }
 }
