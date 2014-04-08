@@ -39,7 +39,7 @@ class Loader implements LoaderInterface
             $result->fail($message);
         } else {
             $body = $response->getBody(true);
-            $result->succeed($body);
+            $result->resolve($body);
         }
     }
 }

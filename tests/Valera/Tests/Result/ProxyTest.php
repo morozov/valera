@@ -20,7 +20,7 @@ class ProxyTest extends \PHPUnit_Framework_TestCase
     public function testSuccess()
     {
         $data = array('foo' => 'bar');
-        $this->proxy->succeed($data);
+        $this->proxy->resolve($data);
 
         /** @var \Valera\Result\Success $result */
         $result = $this->proxy->getResult();

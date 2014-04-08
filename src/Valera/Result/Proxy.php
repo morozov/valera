@@ -13,7 +13,7 @@ class Proxy
      */
     protected $result;
 
-    public function succeed($data)
+    public function resolve($data)
     {
         $this->ensureUnresolved();
         $this->result = $this->getSuccess($data);

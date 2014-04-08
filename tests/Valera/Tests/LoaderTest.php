@@ -12,7 +12,7 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
     public function testSuccessResponse()
     {
         $response = $this->getResponseMock(false);
-        $result = $this->getResultMock('succeed');
+        $result = $this->getResultMock('resolve');
         $this->callProcessResponse($response, $result);
     }
 
