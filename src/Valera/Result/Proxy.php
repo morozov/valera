@@ -13,10 +13,10 @@ class Proxy
      */
     protected $result;
 
-    public function resolve($data)
+    public function resolve()
     {
         $this->ensureUnresolved();
-        $this->result = $this->getSuccess($data);
+        $this->result = $this->getSuccess();
 
         return $this->result;
     }
@@ -45,13 +45,11 @@ class Proxy
     }
 
     /**
-     * @param mixed $data
-     *
      * @return Success
      */
-    protected function getSuccess($data)
+    protected function getSuccess()
     {
-        return new Success($data);
+        return new Success();
     }
 
     /**

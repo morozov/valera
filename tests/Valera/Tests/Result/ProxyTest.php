@@ -19,12 +19,8 @@ class ProxyTest extends \PHPUnit_Framework_TestCase
 
     public function testSuccess()
     {
-        $data = array('foo' => 'bar');
-        $this->proxy->resolve($data);
-
-        /** @var \Valera\Result\Success $result */
-        $result = $this->proxy->getResult();
-        $this->assertEquals($data, $result->getData());
+        $result = $this->proxy->resolve();
+        $this->assertInstanceOf('Valera\Result\Success', $result);
     }
 
     public function testFailure()

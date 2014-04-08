@@ -2,20 +2,41 @@
 
 namespace Valera\Parser\Result;
 
-use ArrayIterator;
-use Countable;
-use IteratorAggregate;
 use Valera\Resource;
 use Valera\Result\Success as BaseSuccess;
 
-class Success extends BaseSuccess implements IteratorAggregate, Countable
+class Success extends BaseSuccess
 {
+    /**
+     * Collected documents
+     *
+     * @var array
+     */
+    protected $documents = array();
+
+    /**
+     * Collected blobs
+     *
+     * @var array
+     */
+    protected $blobs = array();
+
     /**
      * Additional resources to be parsed
      *
      * @var \Valera\Resource[]
      */
     protected $resources = array();
+
+    public function addDocument($id, array $data)
+    {
+        $this->documents[$id] = $data;
+    }
+
+    public function addBlob($documentId, Resource $referrer, $contents)
+    {
+        $this->blobs[$documentId][$referrer->getHash()] = $contents;
+    }
 
     public function addResource(
         $url,
@@ -27,30 +48,25 @@ class Success extends BaseSuccess implements IteratorAggregate, Countable
     }
 
     /**
-     * @return \Iterator|\Valera\Resource[]
+     * @return array
+     */
+    public function getDocuments()
+    {
+        return $this->documents;
+    }
+    /**
+     * @return array
+     */
+    public function getBlobs()
+    {
+        return $this->blobs;
+    }
+
+    /**
+     * @return \Valera\Resource[]
      */
     public function getResources()
     {
-        return new ArrayIterator($this->resources);
-    }
-
-    /**
-     * Retrieve an external iterator
-     *
-     * @return \Iterator
-     */
-    public function getIterator()
-    {
-        return $this->getResources();
-    }
-
-    /**
-     * Count elements of an object
-     * 
-     * @return int
-     */
-    public function count()
-    {
-        return count($this->resources);
+        return $this->resources;
     }
 }

@@ -10,10 +10,7 @@ use Valera\Result\Success;
 class SuccessTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
-    public function dataIsStored()
+    public function addResource()
     {
-        $data = array('foo' => 'bar');
-        $success = new Success($data);
-        $this->assertEquals($data, $success->getData());
     }
 }
