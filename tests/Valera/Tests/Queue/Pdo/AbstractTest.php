@@ -14,7 +14,7 @@ abstract class AbstractTest extends Base
 
     public static function setUpBeforeClass()
     {
-        self::$queue = new Queue(self::$conn);
+        self::$queue = new Queue(self::$conn, 'resource');
         parent::setUpBeforeClass();
     }
 }

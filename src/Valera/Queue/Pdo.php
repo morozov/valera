@@ -22,12 +22,29 @@ class Pdo implements Queue
     protected $conn;
 
     /**
-     * Constructor
+     * @var string
      */
-    public function __construct(\PDO $conn)
+    protected $name;
+
+    /**
+     * Constructor
+     *
+     * @param \PDO $conn
+     * @param string $name
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function __construct(\PDO $conn, $name)
     {
+        if (!is_string($name) || $name === '' || !ctype_alnum($name)) {
+            throw new \InvalidArgumentException(
+                'Queue name must be a nonempty alpha-numeric string'
+            );
+        }
+
         $this->conn = $conn;
         $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $this->name = $name;
     }
 
     /**
@@ -43,15 +60,15 @@ class Pdo implements Queue
         $this->ensureItemRegistered($item);
 
         $query = <<<QUERY
-INSERT INTO resource_queue (resource_hash)
-SELECT * FROM (SELECT :resource_hash) AS tmp
+INSERT INTO {$this->name}_queue (hash)
+SELECT * FROM (SELECT :hash) AS tmp
 WHERE NOT EXISTS (
-    SELECT 1 FROM resource_queue WHERE resource_hash = :resource_hash
+    SELECT 1 FROM {$this->name}_queue WHERE hash = :hash
 )
 QUERY;
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindValue(':resource_hash', $item->getHash());
+        $stmt->bindValue(':hash', $item->getHash());
         $stmt->execute();
     }
 
@@ -60,9 +77,9 @@ QUERY;
     {
         $query = <<<QUERY
 SELECT data
-FROM resource_queue q
+FROM {$this->name}_queue q
 JOIN resource r
-ON r.hash = q.resource_hash
+ON r.hash = q.hash
 ORDER BY position
 LIMIT 1
 QUERY;
@@ -73,8 +90,8 @@ QUERY;
 
         if ($stmt->fetch(\PDO::FETCH_BOUND)) {
             $item = unserialize($data);
-            $this->removeFromCollection($item, 'resource_queue');
-            $this->addToCollection($item, 'resource_in_progress');
+            $this->removeFromCollection($item, 'queue');
+            $this->addToCollection($item, 'in_progress');
             return $item;
         }
 
@@ -84,17 +101,17 @@ QUERY;
     /** @inheritDoc */
     public function resolveCompleted(Queueable $item)
     {
-        $this->ensureInCollection($item, 'resource_in_progress');
-        $this->removeFromCollection($item, 'resource_in_progress');
-        $this->addToCollection($item, 'resource_completed');
+        $this->ensureInCollection($item, 'in_progress');
+        $this->removeFromCollection($item, 'in_progress');
+        $this->addToCollection($item, 'completed');
     }
 
     /** @inheritDoc */
     public function resolveFailed(Queueable $item)
     {
-        $this->ensureInCollection($item, 'resource_in_progress');
-        $this->removeFromCollection($item, 'resource_in_progress');
-        $this->addToCollection($item, 'resource_failed');
+        $this->ensureInCollection($item, 'in_progress');
+        $this->removeFromCollection($item, 'in_progress');
+        $this->addToCollection($item, 'failed');
     }
 
     /** {@inheritDoc} */
@@ -109,19 +126,19 @@ QUERY;
     /** @inheritDoc */
     public function getInProgress()
     {
-        return $this->getCollection('resource_in_progress');
+        return $this->getCollection('in_progress');
     }
 
     /** @inheritDoc */
     public function getCompleted()
     {
-        return $this->getCollection('resource_completed');
+        return $this->getCollection('completed');
     }
 
     /** @inheritDoc */
     public function getFailed()
     {
-        return $this->getCollection('resource_failed');
+        return $this->getCollection('failed');
     }
 
     /** @inheritDoc */
@@ -129,7 +146,7 @@ QUERY;
     {
         $query = <<<QUERY
 SELECT COUNT(*)
-FROM resource_queue
+FROM {$this->name}_queue
 QUERY;
 
         $stmt = $this->conn->prepare($query);
@@ -156,13 +173,13 @@ QUERY;
         $stmt->execute();
     }
 
-    protected function getCollection($table)
+    protected function getCollection($collection)
     {
         $query = <<<QUERY
 SELECT data
-FROM $table c
+FROM {$this->name}_$collection c
 JOIN resource r
-ON r.hash = c.resource_hash
+ON r.hash = c.hash
 QUERY;
         $stmt = $this->conn->prepare($query);
         $stmt->bindColumn(1, $data);
@@ -176,40 +193,40 @@ QUERY;
         return $items;
     }
 
-    protected function addToCollection(Queueable $item, $table)
+    protected function addToCollection(Queueable $item, $collection)
     {
         $query = <<<QUERY
-INSERT INTO $table(resource_hash)
-VALUES(:resource_hash)
+INSERT INTO {$this->name}_$collection(hash)
+VALUES(:hash)
 QUERY;
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindValue(':resource_hash', $item->getHash());
+        $stmt->bindValue(':hash', $item->getHash());
         $stmt->execute();
     }
 
-    protected function removeFromCollection(Queueable $item, $table)
+    protected function removeFromCollection(Queueable $item, $collection)
     {
         $query = <<<QUERY
-DELETE FROM $table
-WHERE resource_hash = :resource_hash
+DELETE FROM {$this->name}_$collection
+WHERE hash = :hash
 QUERY;
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindValue(':resource_hash', $item->getHash());
+        $stmt->bindValue(':hash', $item->getHash());
         $stmt->execute();
     }
 
-    protected function ensureInCollection(Queueable $item, $table)
+    protected function ensureInCollection(Queueable $item, $collection)
     {
         $query = <<<QUERY
-SELECT resource_hash
-FROM $table
-WHERE resource_hash = :resource_hash
+SELECT hash
+FROM {$this->name}_$collection
+WHERE hash = :hash
 QUERY;
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindValue(':resource_hash', $item->getHash());
+        $stmt->bindValue(':hash', $item->getHash());
         $stmt->execute();
 
         if (!$stmt->fetch()) {

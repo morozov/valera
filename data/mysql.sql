@@ -11,44 +11,44 @@ CREATE TABLE resource (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE resource_queue (
-  resource_hash VARCHAR(32) NOT NULL,
+  hash VARCHAR(32) NOT NULL,
   position INT UNSIGNED AUTO_INCREMENT NOT NULL,
-  PRIMARY KEY (resource_hash),
+  PRIMARY KEY (hash),
   UNIQUE KEY uq_resource_queue_position (position)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE resource_in_progress (
-  resource_hash VARCHAR(32) NOT NULL,
+  hash VARCHAR(32) NOT NULL,
   start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (resource_hash)
+  PRIMARY KEY (hash)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE resource_completed (
-  resource_hash VARCHAR(32) NOT NULL,
-  PRIMARY KEY (resource_hash)
+  hash VARCHAR(32) NOT NULL,
+  PRIMARY KEY (hash)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE resource_failed (
-  resource_hash VARCHAR(32) NOT NULL,
-  PRIMARY KEY (resource_hash)
+  hash VARCHAR(32) NOT NULL,
+  PRIMARY KEY (hash)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE resource_queue
-  ADD CONSTRAINT fk_resource_queue_resource_hash
-  FOREIGN KEY (resource_hash)
+  ADD CONSTRAINT fk_resource_queue_hash
+  FOREIGN KEY (hash)
   REFERENCES resource (hash) ON DELETE CASCADE;
 
 ALTER TABLE resource_in_progress
-  ADD CONSTRAINT fk_resource_in_progress_resource_hash
-  FOREIGN KEY (resource_hash)
+  ADD CONSTRAINT fk_resource_in_progress_hash
+  FOREIGN KEY (hash)
   REFERENCES resource (hash) ON DELETE CASCADE;
 
 ALTER TABLE resource_completed
-  ADD CONSTRAINT fk_resource_completed_resource_hash
-  FOREIGN KEY (resource_hash)
+  ADD CONSTRAINT fk_resource_completed_hash
+  FOREIGN KEY (hash)
   REFERENCES resource (hash) ON DELETE CASCADE;
 
 ALTER TABLE resource_failed
-  ADD CONSTRAINT fk_resource_failed_resource_hash
-  FOREIGN KEY (resource_hash)
+  ADD CONSTRAINT fk_resource_failed_hash
+  FOREIGN KEY (hash)
   REFERENCES resource (hash) ON DELETE CASCADE;
