@@ -40,11 +40,12 @@ class Success extends BaseSuccess
 
     public function addResource(
         $url,
+        Resource $referrer,
         $method = Resource::METHOD_GET,
         array $headers = array(),
         array $data = array()
     ) {
-        $this->resources[] = new Resource($url, $method, $headers, $data);
+        $this->resources[] = new Resource($url, $referrer, $method, $headers, $data);
     }
 
     /**

@@ -23,7 +23,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($resource1->equals($resource2));
         
-        $resource3 = new Resource('http://ya.ru', Resource::METHOD_POST);
+        $resource3 = new Resource('http://ya.ru');
         $this->assertFalse($resource1->equals($resource3));
     }
 
@@ -48,7 +48,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
      */
     public function testBadMethod()
     {
-        new Resource('http://url', 42);
+        new Resource('http://url', null, 42);
     }
 
     /**

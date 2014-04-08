@@ -15,6 +15,7 @@ class Resource implements Serializable
     const METHOD_POST = 'POST';
 
     private $url;
+    private $referrer;
     private $method;
     private $headers;
     private $data;
@@ -22,6 +23,7 @@ class Resource implements Serializable
 
     /**
      * @param $url string URL of the resource
+     * @param Resource $referrer HTTP referer
      * @param string $method HTTP method to fetch resource
      * @param array $headers
      * @param array $data
@@ -29,6 +31,7 @@ class Resource implements Serializable
      */
     public function __construct(
         $url,
+        Resource $referrer = null,
         $method = self::METHOD_GET,
         array $headers = array(),
         array $data = array()
@@ -45,6 +48,8 @@ class Resource implements Serializable
                 'Provided URL is incorrect according to » http://www.faqs.org/rfcs/rfc2396'
             );
         }
+
+        $this->referrer = $referrer;
 
         if (!is_string($method)) {
             throw new \InvalidArgumentException(
@@ -78,6 +83,15 @@ class Resource implements Serializable
     public function getUrl()
     {
         return $this->url;
+    }
+
+    /**
+     * Returns resource referrer
+     * @return Resource
+     */
+    public function getReferrer()
+    {
+        return $this->referrer;
     }
 
     /**
@@ -128,7 +142,7 @@ class Resource implements Serializable
             $data = array();
         }
 
-        return new self($url, $method, $headers, $data);
+        return new self($url, null, $method, $headers, $data);
     }
 
     /**
