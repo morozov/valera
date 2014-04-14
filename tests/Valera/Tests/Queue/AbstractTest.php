@@ -28,8 +28,8 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
         parent::setUpBeforeClass();
         self::$queue->clean();
 
-        self::$s1 = new Source(new Resource('http://example.com/'), '');
-        self::$s2 = new Source(new Resource('http://example.org/'), '');
+        self::$s1 = new Source('product', new Resource('http://example.com/'));
+        self::$s2 = new Source('product', new Resource('http://example.org/'));
     }
 
     protected function tearDown()

@@ -20,12 +20,12 @@ class Source implements Queueable
     private $type;
 
     /**
-     * @param \Valera\Resource $resource
      * @param string $type
      *
+     * @param \Valera\Resource $resource
      * @throws \InvalidArgumentException
      */
-    public function __construct(Resource $resource, $type)
+    public function __construct($type, Resource $resource)
     {
         if (!is_string($type)) {
             throw new \InvalidArgumentException(
@@ -64,8 +64,7 @@ class Source implements Queueable
         }
 
         return new self(
-            Resource::fromArray($params['resource']),
-            $params['type']
+            $params['type'], Resource::fromArray($params['resource'])
         );
     }
 

@@ -4,6 +4,7 @@ namespace Valera\Tests\Parser\Result;
 
 use Valera\Parser\Result\Success;
 use Valera\Resource;
+use Valera\Source;
 
 /**
  * @covers \Valera\Parser\Result\Success
@@ -19,15 +20,17 @@ class SuccessTest extends \PHPUnit_Framework_TestCase
         $u2 = 'http://example2.com';
 
         $success = new Success();
-        $success->addResource($u1, $referrer);
-        $success->addResource($u2, $referrer);
+        $success->addSource('product', $u1, $referrer);
+        $success->addSource('product', $u2, $referrer);
 
         $r1 = new Resource($u1, $referrer);
         $r2 = new Resource($u2, $referrer);
+        $s1 = new Source('product', $r1);
+        $s2 = new Source('product', $r2);
 
-        $resources = $success->getResources();
-        $this->assertCount(2, $resources);
-        $this->assertContains($r1, $resources, '', false, false);
-        $this->assertContains($r2, $resources, '', false, false);
+        $sources = $success->getSources();
+        $this->assertCount(2, $sources);
+        $this->assertContains($s1, $sources, '', false, false);
+        $this->assertContains($s2, $sources, '', false, false);
     }
 }

@@ -2,7 +2,9 @@
 
 namespace Valera\Parser\Result;
 
+use Valera\Document;
 use Valera\Resource;
+use Valera\Source;
 use Valera\Result\Success as BaseSuccess;
 
 class Success extends BaseSuccess
@@ -22,30 +24,28 @@ class Success extends BaseSuccess
     protected $blobs = array();
 
     /**
-     * Additional resources to be parsed
+     * Additional sources to be parsed
      *
-     * @var \Valera\Resource[]
+     * @var \Valera\Source[]
      */
-    protected $resources = array();
+    protected $sources = array();
 
-    public function addDocument($id, array $data)
+    public function addDocument($id, array $data, $type = null)
     {
-        $this->documents[$id] = $data;
+        $this->documents[] = new Document($id, $data, $type);
     }
 
-    public function addBlob($documentId, Resource $referrer, $contents)
-    {
-        $this->blobs[$documentId][$referrer->getHash()] = $contents;
-    }
-
-    public function addResource(
+    public function addSource(
+        $type,
         $url,
         Resource $referrer,
         $method = Resource::METHOD_GET,
         array $headers = array(),
         array $data = array()
     ) {
-        $this->resources[] = new Resource($url, $referrer, $method, $headers, $data);
+        $resource = new Resource($url, $referrer, $method, $headers, $data);
+        $source = new Source($type, $resource);
+        $this->sources[] = $source;
     }
 
     /**
@@ -55,19 +55,12 @@ class Success extends BaseSuccess
     {
         return $this->documents;
     }
-    /**
-     * @return array
-     */
-    public function getBlobs()
-    {
-        return $this->blobs;
-    }
 
     /**
      * @return \Valera\Resource[]
      */
-    public function getResources()
+    public function getSources()
     {
-        return $this->resources;
+        return $this->sources;
     }
 }
