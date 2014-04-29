@@ -10,14 +10,19 @@ class InMemory implements BlobStorage
 {
     protected $blobs = array();
 
-    public function create(Resource $resource, $data)
+    /**
+     * {@inheritDoc}
+     */
+    public function create(Resource $resource, $contents)
     {
         $hash = $resource->getHash();
         if (isset($this->blobs[$hash])) {
             throw new DomainException('Blob already exists');
         }
 
-        $this->blobs[$hash] = $data;
+        $this->blobs[$hash] = $contents;
+
+        return $hash;
     }
 
     public function retrieve(Resource $resource)

@@ -2,7 +2,8 @@
 
 namespace Valera\Parser\Result;
 
-use Valera\Blob;
+use Valera\Blob\Remote as RemoteBlob;
+use Valera\Blob\Local as LocalBlob;
 use Valera\Queue;
 use Valera\Resource;
 use Valera\Source;
@@ -55,7 +56,14 @@ class Success extends BaseSuccess
 
     public function addBlob(Resource $resource, $data)
     {
-        $this->blobStorage->create($resource, $data);
+        $path = $this->blobStorage->create($resource, $data);
+        $hash = $resource->getHash();
+        $documents = $this->documentStorage->findByBlob($hash);
+        foreach ($documents as $id => $data) {
+            $this->convertBlob($data, $hash, $path);
+            $blobs = $this->findBlobs($data);
+            $this->documentStorage->update($id, $data, $blobs);
+        }
     }
 
     public function addSource(
@@ -72,7 +80,7 @@ class Success extends BaseSuccess
     }
 
     /**
-     * @param Blob[] $blobs
+     * @param RemoteBlob[] $blobs
      */
     protected function enqueueBlobs(array $blobs)
     {
@@ -83,20 +91,39 @@ class Success extends BaseSuccess
         }
     }
 
+    protected function iterate(array &$data, callable $filter, callable $callback)
+    {
+        array_walk_recursive($data, function (&$value) use ($filter, $callback) {
+            if ($filter($value)) {
+                $callback($value);
+            }
+        });
+    }
+
     /**
      * @param array $data
      *
-     * @return \Valera\Blob[]
+     * @return array
      */
     protected function findBlobs(array $data)
     {
         $blobs = array();
-        array_walk_recursive($data, function ($value) use (&$blobs) {
-            if ($value instanceof Blob) {
-                $blobs[] = $value->getHash();
-            }
+        $this->iterate($data, function ($value) {
+            return $value instanceof RemoteBlob;
+        }, function (RemoteBlob $value) use (&$blobs) {
+            $blobs[] = $value->getHash();
         });
 
         return $blobs;
+    }
+
+    protected function convertBlob(array &$data, RemoteBlob $blob, $path)
+    {
+        $this->iterate($data, function ($value) use ($blob) {
+            return $value instanceof RemoteBlob
+                && $value->getHash() === $blob->getHash();
+        }, function (RemoteBlob &$value) use ($path) {
+            $value = new LocalBlob($path);
+        });
     }
 }

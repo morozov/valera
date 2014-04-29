@@ -4,7 +4,6 @@ namespace Valera\Storage\DocumentStorage;
 
 use DomainException;
 use MongoDuplicateKeyException;
-use Valera\Blob;
 use Valera\Storage\BlobStorage;
 use Valera\Storage\DocumentStorage;
 

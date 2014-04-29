@@ -7,7 +7,15 @@ use Valera\Resource;
 
 interface BlobStorage extends Countable
 {
-    public function create(Resource $resource, $data);
+    /**
+     * Stores blob contents and returns its path
+     *
+     * @param \Valera\Resource $resource
+     * @param string $contents
+     *
+     * @return string
+     */
+    public function create(Resource $resource, $contents);
     public function retrieve(Resource $resource);
     public function delete(Resource $resource);
     public function clean();

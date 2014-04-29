@@ -2,12 +2,11 @@
 
 namespace Valera\Tests\Parser\Result;
 
-use Valera\Blob;
-use Valera\Document;
+use Valera\Blob\Remote as RemoteBlob;
+use Valera\Blob\Local as LocalBlob;
 use Valera\Parser\Result\Success;
 use Valera\Queue;
 use Valera\Resource;
-use Valera\Source;
 use Valera\Storage\BlobStorage;
 use Valera\Storage\DocumentStorage;
 
@@ -61,12 +60,17 @@ class SuccessTest extends \PHPUnit_Framework_TestCase
     {
         $resource = new Resource('http://example.com');
 
-        $storage = $this->getBlobStorage();
-        $storage->expects($this->once())
+        $documentStorage = $this->getDocumentStorage();
+        $documentStorage->expects($this->any())
+            ->method('findByBlob')
+            ->will($this->returnValue(array()));
+
+        $blobStorage = $this->getBlobStorage();
+        $blobStorage->expects($this->once())
             ->method('create')
             ->with($resource, 'the-data');
 
-        $success = $this->getSuccess(null, $storage, null);
+        $success = $this->getSuccess($documentStorage, $blobStorage, null);
         $success->addBlob($resource, 'the-data');
     }
 
@@ -105,8 +109,8 @@ class SuccessTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function findBlobs()
     {
-        $image1 = new Blob('http://example.com');
-        $image2 = new Blob('http://example.com');
+        $image1 = new RemoteBlob('http://example.com');
+        $image2 = new RemoteBlob('http://example.com');
         $document = array(
             'image' => $image1,
             'some' => array(
@@ -124,8 +128,29 @@ class SuccessTest extends \PHPUnit_Framework_TestCase
         $findBlobs->setAccessible(true);
         $blobs = $findBlobs->invokeArgs($success, array($document));
 
-        $this->assertContains($image1, $blobs);
-        $this->assertContains($image2, $blobs);
+        $this->assertContains($image1->getHash(), $blobs);
+        $this->assertContains($image2->getHash(), $blobs);
+    }
+
+    /** @test */
+    public function convertBlob()
+    {
+        $remoteBlob = new RemoteBlob('http://example.com');
+        $document = array(
+            'image' => $remoteBlob,
+        );
+
+        $success = $this->getSuccess(null, null, null);
+        $reflector = new \ReflectionObject($success);
+        $convertBlob = $reflector->getMethod('convertBlob');
+        $convertBlob->setAccessible(true);
+        $convertBlob->invokeArgs($success, array(
+            &$document, $remoteBlob, '/path/to/image'
+        ));
+
+        $this->assertEquals(array(
+            'image' => new LocalBlob('/path/to/image'),
+        ), $document);
     }
 
     private function getDocumentStorage()

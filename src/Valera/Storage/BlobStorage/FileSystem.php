@@ -14,14 +14,19 @@ class FileSystem implements BlobStorage
         $this->root = $root;
     }
 
-    public function create(Resource $resource, $data)
+    /**
+     * {@inheritDoc}
+     */
+    public function create(Resource $resource, $contents)
     {
         $path = $this->getPath($resource);
         $dir = dirname($path);
         if (!file_exists($dir)) {
             mkdir($dir, 0777, true);
         }
-        file_put_contents($path, $data);
+        file_put_contents($path, $contents);
+
+        return $path;
     }
 
     public function retrieve(Resource $resource)

@@ -2,8 +2,6 @@
 
 namespace Valera\Storage;
 
-use Valera\Blob;
-
 interface DocumentStorage extends \Countable
 {
     public function create($id, array $data, array $blobs);
