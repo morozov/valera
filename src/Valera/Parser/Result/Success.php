@@ -2,37 +2,60 @@
 
 namespace Valera\Parser\Result;
 
-use Valera\Document;
+use Valera\Blob;
+use Valera\Queue;
 use Valera\Resource;
 use Valera\Source;
+use Valera\Storage\DocumentStorage;
+use Valera\Storage\BlobStorage;
 use Valera\Result\Success as BaseSuccess;
 
 class Success extends BaseSuccess
 {
     /**
-     * Collected documents
-     *
-     * @var array
+     * @var \Valera\Storage\DocumentStorage
      */
-    protected $documents = array();
+    protected $documentStorage;
 
     /**
-     * Collected blobs
-     *
-     * @var array
+     * @var \Valera\Storage\BlobStorage
      */
-    protected $blobs = array();
+    protected $blobStorage;
 
     /**
-     * Additional sources to be parsed
-     *
-     * @var \Valera\Source[]
+     * @var \Valera\Queue
      */
-    protected $sources = array();
+    protected $sourceQueue;
 
-    public function addDocument($id, array $data, $type = null)
+    public function __construct(
+        DocumentStorage $documentStorage,
+        BlobStorage $blobStorage,
+        Queue $sourceQueue
+    ) {
+        $this->documentStorage = $documentStorage;
+        $this->blobStorage = $blobStorage;
+        $this->sourceQueue = $sourceQueue;
+    }
+
+    public function addDocument($id, array $data)
     {
-        $this->documents[] = new Document($id, $data, $type);
+        $blobs = $this->findBlobs($data);
+        $this->documentStorage->create($id, $data, $blobs);
+        $this->enqueueBlobs($blobs);
+    }
+
+    public function updateDocument($id, callable $callback)
+    {
+        $data = $this->documentStorage->retrieve($id);
+        $data = $callback($data);
+        $blobs = $this->findBlobs($data);
+        $this->documentStorage->update($id, $data, $blobs);
+        $this->enqueueBlobs($blobs);
+    }
+
+    public function addBlob(Resource $resource, $data)
+    {
+        $this->blobStorage->create($resource, $data);
     }
 
     public function addSource(
@@ -45,22 +68,35 @@ class Success extends BaseSuccess
     ) {
         $resource = new Resource($url, $referrer, $method, $headers, $data);
         $source = new Source($type, $resource);
-        $this->sources[] = $source;
+        $this->sourceQueue->enqueue($source);
     }
 
     /**
-     * @return array
+     * @param Blob[] $blobs
      */
-    public function getDocuments()
+    protected function enqueueBlobs(array $blobs)
     {
-        return $this->documents;
+        foreach ($blobs as $blob) {
+            $resource = $blob->getResource();
+            $source = new Source(Resource::TYPE_BLOB, $resource);
+            $this->sourceQueue->enqueue($source);
+        }
     }
 
     /**
-     * @return \Valera\Resource[]
+     * @param array $data
+     *
+     * @return \Valera\Blob[]
      */
-    public function getSources()
+    protected function findBlobs(array $data)
     {
-        return $this->sources;
+        $blobs = array();
+        array_walk_recursive($data, function ($value) use (&$blobs) {
+            if ($value instanceof Blob) {
+                $blobs[] = $value->getHash();
+            }
+        });
+
+        return $blobs;
     }
 }

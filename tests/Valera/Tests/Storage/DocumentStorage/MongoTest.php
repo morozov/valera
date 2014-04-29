@@ -1,20 +1,16 @@
 <?php
 
-namespace Valera\Tests\Queue;
+namespace Valera\Tests\Storage\DocumentStorage;
 
-use Valera\Queue\Mongo as Queue;
-use Valera\Serialize\ArraySerializer;
+use Valera\Storage\DocumentStorage\Mongo as Storage;
 use Valera\Tests\Helper;
 
-/**
- * @requires extension mongo
- */
 class MongoTest extends AbstractTest
 {
     public static function setUpBeforeClass()
     {
         $db = Helper::getMongo();
-        self::$queue = new Queue($db, new ArraySerializer());
+        self::$storage = new Storage($db);
 
         parent::setUpBeforeClass();
     }

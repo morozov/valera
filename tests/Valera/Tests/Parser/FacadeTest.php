@@ -4,9 +4,9 @@ namespace Valera\Tests\Parser;
 
 use Valera\Content;
 use Valera\Parser\ParserInterface;
-use Valera\Parser\Result\Proxy;
 use Valera\Parser\Facade;
 use Valera\Resource;
+use Valera\Source;
 
 /**
  * @covers \Valera\Parser\Facade
@@ -16,7 +16,9 @@ class FacadeTest extends \PHPUnit_Framework_TestCase
     public function testImplementationIsCalled()
     {
         $content = $this->getContent();
-        $result = new Proxy();
+        $result = $this->getMockBuilder('Valera\Parser\Result\Proxy')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $parser = $this->getMockBuilder('Valera\Parser\ParserInterface')
             ->getMock();
@@ -34,6 +36,7 @@ class FacadeTest extends \PHPUnit_Framework_TestCase
     {
         $content = $this->getContent();
         $result = $this->getMockBuilder('Valera\Parser\Result\Proxy')
+            ->disableOriginalConstructor()
             ->setMethods(array('fail'))
             ->getMock();
         $result->expects($this->once())
@@ -59,7 +62,8 @@ class FacadeTest extends \PHPUnit_Framework_TestCase
     private function getContent()
     {
         $resource = new Resource('http://example.com/');
-        $content = new Content('', '', $resource);
+        $source = new Source('', $resource);
+        $content = new Content('', $source);
 
         return $content;
     }

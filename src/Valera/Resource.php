@@ -13,6 +13,7 @@ class Resource implements Serializable
 {
     const METHOD_GET = 'GET';
     const METHOD_POST = 'POST';
+    const TYPE_BLOB = 'blob';
 
     private $url;
     private $referrer;

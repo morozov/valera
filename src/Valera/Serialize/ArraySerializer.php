@@ -48,7 +48,7 @@ class ArraySerializer implements Serializer
         return array(
             'content' => $content->getContent(),
             'type' => $content->getType(),
-            'resource' => $this->serialize($content->getResource()),
+            'resource' => $this->serialize($content->getSource()),
         );
     }
 }

@@ -7,10 +7,9 @@ use Valera\Serialize\Serializer;
 class Content implements Queueable
 {
     protected $content;
-    protected $type;
-    protected $resource;
+    protected $source;
 
-    public function __construct($content, $type, Resource $resource)
+    public function __construct($content, Source $source)
     {
         if (!is_string($content)) {
             throw new \InvalidArgumentException(
@@ -18,8 +17,7 @@ class Content implements Queueable
             );
         }
         $this->content = $content;
-        $this->type = $type;
-        $this->resource = $resource;
+        $this->source = $source;
     }
 
     public function getContent()
@@ -29,12 +27,12 @@ class Content implements Queueable
 
     public function getType()
     {
-        return $this->type;
+        return $this->source->getType();
     }
 
-    public function getResource()
+    public function getSource()
     {
-        return $this->resource;
+        return $this->source;
     }
 
     /**
@@ -44,7 +42,7 @@ class Content implements Queueable
      */
     public function getHash()
     {
-        return $this->resource->getHash();
+        return $this->source->getHash();
     }
 
     public function accept(Serializer $serializer)
