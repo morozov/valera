@@ -3,24 +3,34 @@
 namespace Valera\Tests;
 
 use Valera\Loader;
+use Valera\Resource;
+use Valera\Source;
 
 /**
  * @covers \Valera\Loader
  */
 class LoaderTest extends \PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->markTestIncomplete();
+    }
+
     public function testSuccessResponse()
     {
         $response = $this->getResponseMock(false);
         $result = $this->getResultMock('resolve');
-        $this->callProcessResponse($response, $result);
+        $source = $this->getSource();
+        $this->callProcessResponse($response, $result, $source);
     }
 
     public function testFailedResponse()
     {
         $response = $this->getResponseMock(true);
         $result = $this->getResultMock('fail');
-        $this->callProcessResponse($response, $result);
+        $source = $this->getSource();
+        $this->callProcessResponse($response, $result, $source);
     }
 
     private function getResponseMock($isError)
@@ -38,14 +48,24 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
 
     private function getResultMock($expectedMethod)
     {
-        $result = $this->getMock('Valera\Result\Proxy');
+        $result = $this->getMockBuilder('Valera\Loader\Result\Proxy')
+            ->disableOriginalConstructor()
+            ->getMock();
         $result->expects($this->once())
             ->method($expectedMethod);
 
         return $result;
     }
 
-    private function callProcessResponse($response, $result)
+    private function getSource()
+    {
+        $resource = new Resource('http://example.com/');
+        $source = new Source('example', $resource);
+
+        return $source;
+    }
+
+    private function callProcessResponse($response, $result, $source)
     {
         $loader = $this->getMockBuilder('Valera\Loader')
             ->disableOriginalConstructor()
@@ -53,6 +73,6 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $re = new \ReflectionMethod($loader, 'processResponse');
         $re->setAccessible(true);
-        $re->invoke($loader, $response, $result);
+        $re->invoke($loader, $response, $result, $source);
     }
 }
