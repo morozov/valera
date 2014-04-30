@@ -38,7 +38,7 @@ class Pdo implements Queue
     {
         if (!is_string($name) || $name === '' || !ctype_alnum($name)) {
             throw new \InvalidArgumentException(
-                'Queue name must be a nonempty alpha-numeric string'
+                'Queue name must be a non-empty alpha-numeric string'
             );
         }
 

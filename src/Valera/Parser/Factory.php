@@ -45,12 +45,29 @@ class Factory implements FactoryInterface
     protected function loadParser($type)
     {
         foreach (array_keys($this->namespaces) as $namespace) {
-            $class = $namespace . '\\' . ucfirst($type);
+            $class = $namespace . '\\' . $this->camelize($type, true);
             if (class_exists($class)) {
                 return new $class;
             }
         }
 
         return null;
+    }
+
+    /**
+     * Translates a string with underscores or dashes
+     * into camel case (e.g. first_name -> firstName)
+     *
+     * @param string $str String in underscore format
+     * @param bool $ucfirst If true, capitalise the first char in $str
+     * @return string $str translated into camel caps
+     */
+    function camelize($str, $ucfirst = false) {
+        if ($ucfirst) {
+            $str[0] = strtoupper($str[0]);
+        }
+        return preg_replace_callback('/[_-]([a-z])/', function($c) {
+            return strtoupper($c[1]);
+        }, $str);
     }
 }

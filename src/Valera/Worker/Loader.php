@@ -3,25 +3,43 @@
 namespace Valera\Worker;
 
 use Valera\Loader\LoaderInterface;
+use Valera\Loader\Result\Proxy as ResultProxy;
 use Valera\Queue;
 
-class Loader
+class Loader extends AbstractWorker
 {
     /** @var Queue */
-    protected $resourceQueue;
+    protected $sourceQueue;
     protected $contentQueue;
     protected $loader;
 
-    public function __construct($resourceQueue, $contentQueue, LoaderInterface$loader)
-    {
-        $this->resourceQueue = $resourceQueue;
+    public function __construct(
+        Queue $sourceQueue,
+        Queue $contentQueue,
+        LoaderInterface $loader
+    ) {
+        parent::__construct();
+
+        $this->sourceQueue = $sourceQueue;
         $this->contentQueue = $contentQueue;
+        $this->loader = $loader;
     }
 
-    public function run()
+    protected function process()
     {
-        while (count($this->resourceQueue) > 0) {
-            $resource = $this->resourceQueue->dequeue();
-        }
+        $proxy = $this->getResultProxy();
+        $this->loader->load($this->item, $proxy);
+
+        return $proxy->getResult();
+    }
+
+    protected function getQueue()
+    {
+        return $this->sourceQueue;
+    }
+
+    protected function getResultProxy()
+    {
+        return new ResultProxy($this->contentQueue);
     }
 }

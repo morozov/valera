@@ -64,4 +64,9 @@ class FileSystem implements BlobStorage
     {
         exec('rm -r ' . escapeshellarg($this->root));
     }
+
+    public function count()
+    {
+        return 0;
+    }
 }

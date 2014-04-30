@@ -6,8 +6,6 @@ use MongoCursorException;
 use Valera\Queueable;
 use Valera\Queue;
 use Valera\Queue\Exception\LogicException;
-use Valera\Serialize\Serializer;
-use Valera\Source;
 
 /**
  * MongoDB implementation of queue
@@ -20,22 +18,32 @@ class Mongo implements Queue
      * @var \MongoDB
      */
     protected $db;
-    protected $serializer;
+
+    /**
+     * @var string
+     */
+    protected $name;
 
     /**
      * Constructor
      */
-    public function __construct(\MongoDB $db, Serializer $serializer)
+    public function __construct(\MongoDB $db, $name)
     {
+        if (!is_string($name) || $name === '' || !ctype_alnum($name)) {
+            throw new \InvalidArgumentException(
+                'Queue name must be a non-empty alpha-numeric string'
+            );
+        }
+
         $this->db = $db;
-        $this->serializer = $serializer;
+        $this->name = $name;
         $this->setUp();
     }
 
     protected function setUp()
     {
         try {
-            $this->db->counters->insert([
+            $this->db->{$this->name . '_counters'}->insert([
                 '_id' => 'pending',
                 'seq' => 0,
             ]);
@@ -45,19 +53,20 @@ class Mongo implements Queue
             }
         }
 
-        $this->db->pending->ensureIndex(['sec' => 1]);
+        $this->db->{$this->name . '_pending'}->ensureIndex(['sec' => 1]);
     }
     
     /** @inheritDoc */
     public function enqueue(Queueable $item)
     {
+        $d = [
+            '_id' => $item->getHash(),
+            'seq' => $this->getNextSequence('pending'),
+            'data' => serialize($item),
+        ];
         try {
             /** @var \MongoCollection $pending */
-            $this->db->pending->insert([
-                '_id' => $item->getHash(),
-                'seq' => $this->getNextSequence('pending'),
-                'data' => $this->serialize($item),
-            ]);
+            $this->db->{$this->name . '_pending'}->insert($d);
         } catch (MongoCursorException $e) {
             if ($e->getCode() !== 11000) {
                 throw $e;
@@ -67,7 +76,7 @@ class Mongo implements Queue
 
     protected function getNextSequence($name)
     {
-        $ret = $this->db->counters->findAndModify(
+        $ret = $this->db->{$this->name . '_counters'}->findAndModify(
             ['_id' => $name],
             ['$inc' => ['seq' => 1]],
             null,
@@ -80,7 +89,7 @@ class Mongo implements Queue
     /** @inheritDoc */
     public function dequeue()
     {
-        $ret = $this->db->pending->findAndModify(
+        $ret = $this->db->{$this->name . '_pending'}->findAndModify(
             [],
             [],
             null,
@@ -94,7 +103,7 @@ class Mongo implements Queue
             return null;
         }
 
-        $item = Source::fromArray($ret['data']);
+        $item = unserialize($ret['data']);
 
         /** @var \MongoCollection $pending */
         $this->addToCollection($item, 'in_progress');
@@ -119,11 +128,11 @@ class Mongo implements Queue
     /** {@inheritDoc} */
     public function clean()
     {
-        $this->db->counters->drop();
-        $this->db->pending->drop();
-        $this->db->in_progress->drop();
-        $this->db->completed->drop();
-        $this->db->failed->drop();
+        $this->db->{$this->name . '_counters'}->drop();
+        $this->db->{$this->name . '_pending'}->drop();
+        $this->db->{$this->name . '_in_progress'}->drop();
+        $this->db->{$this->name . '_completed'}->drop();
+        $this->db->{$this->name . '_failed'}->drop();
         $this->setUp();
     }
 
@@ -148,15 +157,15 @@ class Mongo implements Queue
     /** @inheritDoc */
     public function count()
     {
-        return $this->db->pending->count();
+        return $this->db->{$this->name . '_pending'}->count();
     }
 
     protected function getCollection($name)
     {
         $items = array();
-        $collection = $this->db->$name->find();
+        $collection = $this->db->{$this->name . '_' . $name}->find();
         foreach ($collection as $document) {
-            $items[] = Source::fromArray($document['data']);
+            $items[] = unserialize($document['data']);
         }
 
         return $items;
@@ -164,15 +173,15 @@ class Mongo implements Queue
 
     protected function addToCollection(Queueable $item, $name)
     {
-        $this->db->$name->insert([
+        $this->db->{$this->name . '_' . $name}->insert([
             '_id' => $item->getHash(),
-            'data' => $this->serialize($item),
+            'data' => serialize($item),
         ]);
     }
 
     protected function ensureAndRemove(Queueable $item, $name)
     {
-        $res = $this->db->$name->findAndModify(
+        $res = $this->db->{$this->name . '_' . $name}->findAndModify(
             ['_id' => $item->getHash()],
             [],
             null,
@@ -184,10 +193,5 @@ class Mongo implements Queue
         if (!$res) {
             throw new LogicException('Item is not in progress');
         }
-    }
-
-    protected function serialize(Queueable $item)
-    {
-        return $this->serializer->serialize($item);
     }
 }

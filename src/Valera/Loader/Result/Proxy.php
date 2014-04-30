@@ -5,6 +5,9 @@ namespace Valera\Loader\Result;
 use Valera\Queue;
 use Valera\Result\Proxy as BaseProxy;
 
+/**
+ * @method Success resolve()
+ */
 class Proxy extends BaseProxy
 {
     /**

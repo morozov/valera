@@ -14,7 +14,7 @@ class MongoTest extends AbstractTest
     public static function setUpBeforeClass()
     {
         $db = Helper::getMongo();
-        self::$queue = new Queue($db, new ArraySerializer());
+        self::$queue = new Queue($db, 'test');
 
         parent::setUpBeforeClass();
     }

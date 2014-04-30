@@ -25,6 +25,11 @@ class Content implements Queueable
         return $this->content;
     }
 
+    public function __toString()
+    {
+        return $this->getContent();
+    }
+
     public function getType()
     {
         return $this->source->getType();
