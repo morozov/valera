@@ -43,6 +43,8 @@ class Success extends BaseSuccess
         $blobs = $this->findBlobs($data);
         $this->documentStorage->create($id, $data, $blobs);
         $this->enqueueBlobs($blobs);
+
+        return $this;
     }
 
     public function updateDocument($id, callable $callback)
@@ -52,6 +54,8 @@ class Success extends BaseSuccess
         $blobs = $this->findBlobs($data);
         $this->documentStorage->update($id, $data, $blobs);
         $this->enqueueBlobs($blobs);
+
+        return $this;
     }
 
     public function addBlob(Resource $resource, $data)
@@ -64,6 +68,8 @@ class Success extends BaseSuccess
             $blobs = $this->findBlobs($data);
             $this->documentStorage->update($id, $data, $blobs);
         }
+
+        return $this;
     }
 
     public function addSource(
@@ -77,6 +83,8 @@ class Success extends BaseSuccess
         $resource = new Resource($url, $referrer, $method, $headers, $data);
         $source = new Source($type, $resource);
         $this->sourceQueue->enqueue($source);
+
+        return $this;
     }
 
     /**

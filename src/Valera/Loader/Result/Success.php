@@ -23,5 +23,7 @@ class Success extends BaseSuccess
     {
         $content = new Content($content, $source);
         $this->contentQueue->enqueue($content);
+
+        return $this;
     }
 }
