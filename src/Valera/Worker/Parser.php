@@ -40,7 +40,13 @@ class Parser extends AbstractWorker
     protected function process()
     {
         $proxy = $this->getResultProxy();
-        $this->parser->parse($this->item, $proxy);
+        $documents = $this->parser->parse($this->item, $proxy);
+        if ($documents !== null) {
+            $success = $proxy->resolve();
+            foreach ($documents as $id => $data) {
+                $success->addDocument($id, $data);
+            }
+        }
 
         return $proxy->getResult();
     }

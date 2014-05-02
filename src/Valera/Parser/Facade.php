@@ -25,12 +25,14 @@ class Facade implements ParserInterface
         $type = $content->getType();
         $parser = $this->factory->getParser($type);
         if ($parser) {
-            $parser->parse($content, $result);
-        } else {
-            $result->fail(sprintf(
-                'Unable to load parser of type %s',
-                $type
-            ));
+            return $parser->parse($content, $result);
         }
+
+        $result->fail(sprintf(
+            'Unable to load parser of type %s',
+            $type
+        ));
+
+        return null;
     }
 }
