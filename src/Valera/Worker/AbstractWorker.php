@@ -30,15 +30,19 @@ abstract class AbstractWorker implements WorkerInterface
 
     public function run()
     {
+        $count = 0;
         $queue = $this->getQueue();
         while (count($queue) > 0) {
             $this->item = $queue->dequeue();
             $result = $this->process();
             $this->visit($result);
+            $count++;
 
             // let the shutdown function know there's no item being processed
             $this->item = null;
         }
+
+        return $count;
     }
 
     abstract protected function process();

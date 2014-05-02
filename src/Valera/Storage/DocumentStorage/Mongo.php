@@ -94,4 +94,10 @@ class Mongo implements DocumentStorage
     {
         return $this->db->documents->count();
     }
+
+    public function getIterator()
+    {
+        $cursor = $this->db->documents->find();
+        return new Mongo\Iterator($cursor);
+    }
 }

@@ -2,7 +2,7 @@
 
 namespace Valera\Storage;
 
-interface DocumentStorage extends \Countable
+interface DocumentStorage extends \Countable, \IteratorAggregate
 {
     public function create($id, array $data, array $blobs);
     public function retrieve($id);

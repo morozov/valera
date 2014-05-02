@@ -70,6 +70,11 @@ class InMemory implements DocumentStorage
         return count($this->documents);
     }
 
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->documents);
+    }
+
     /**
      * @param string $id Document ID
      * @param array $data Document data
@@ -77,10 +82,7 @@ class InMemory implements DocumentStorage
      */
     protected function store($id, array $data, array $blobs)
     {
-        $this->documents[$id] = array(
-            'data' => $data,
-            'blobs' => $blobs,
-        );
+        $this->documents[$id] = $data;
 
         $this->removeFromIndex($id);
         $this->addToIndex($id, $blobs);
