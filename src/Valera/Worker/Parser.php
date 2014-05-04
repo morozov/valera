@@ -51,6 +51,7 @@ class Parser extends AbstractWorker
         $this->documentStorage = $documentStorage;
         $this->blobStorage = $blobStorage;
         $this->parser = $parser;
+        $this->iterator = $iterator;
     }
 
     protected function getQueue()
