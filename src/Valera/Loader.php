@@ -5,7 +5,7 @@ namespace Valera;
 use Guzzle\Http\ClientInterface;
 use Guzzle\Http\Message\Response;
 use Valera\Loader\LoaderInterface;
-use Valera\Loader\Result\Proxy as Result;
+use Valera\Loader\Result as LoaderResult;
 
 class Loader implements LoaderInterface
 {
@@ -16,10 +16,10 @@ class Loader implements LoaderInterface
         $this->httpClient = $httpClient;
     }
 
-    public function load(Source $source, Result $result)
+    public function load(Source $source, LoaderResult $result)
     {
         $response = $this->sendRequest($source->getResource());
-        $this->processResponse($response, $result, $source);
+        $this->processResponse($response, $result);
     }
 
     protected function sendRequest(Resource $resource)
@@ -32,17 +32,14 @@ class Loader implements LoaderInterface
         )->send();
     }
 
-    protected function processResponse(
-        Response $response,
-        Result $result,
-        Source $source
-    ) {
+    protected function processResponse(Response $response, LoaderResult $result)
+    {
         if ($response->isError()) {
             $message = $response->getStatusCode();
             $result->fail($message);
         } else {
             $body = $response->getBody(true);
-            $result->resolve()->addContent($body, $source);
+            $result->setContent($body);
         }
     }
 }

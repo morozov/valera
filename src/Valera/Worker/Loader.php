@@ -2,8 +2,10 @@
 
 namespace Valera\Worker;
 
+use Valera\Content;
 use Valera\Loader\LoaderInterface;
-use Valera\Loader\Result\Proxy as ResultProxy;
+use Valera\Loader\Result;
+use Valera\Result as BaseResult;
 use Valera\Queue;
 
 class Loader extends AbstractWorker
@@ -25,21 +27,30 @@ class Loader extends AbstractWorker
         $this->loader = $loader;
     }
 
-    protected function process()
-    {
-        $proxy = $this->getResultProxy();
-        $this->loader->load($this->item, $proxy);
-
-        return $proxy->getResult();
-    }
-
     protected function getQueue()
     {
         return $this->sourceQueue;
     }
 
-    protected function getResultProxy()
+    protected function createResult()
     {
-        return new ResultProxy($this->contentQueue);
+        return new Result();
+    }
+
+    protected function process($source, $result)
+    {
+        $this->loader->load($source, $result);
+    }
+
+    protected function handleSuccess($source, $result)
+    {
+        /** @var \Valera\Loader\Result $result */
+        $content = new Content(
+            $result->getContent(),
+            $source
+        );
+
+        $this->contentQueue->enqueue($content);
+        parent::handleSuccess($source, $result);
     }
 }

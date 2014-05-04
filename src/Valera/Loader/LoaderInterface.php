@@ -3,7 +3,6 @@
 namespace Valera\Loader;
 
 use Valera\Source;
-use Valera\Loader\Result\Proxy as Result;
 
 interface LoaderInterface
 {

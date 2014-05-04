@@ -16,7 +16,7 @@ class FacadeTest extends \PHPUnit_Framework_TestCase
     public function testImplementationIsCalled()
     {
         $content = $this->getContent();
-        $result = $this->getMockBuilder('Valera\Parser\Result\Proxy')
+        $result = $this->getMockBuilder('Valera\Parser\Result')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -35,7 +35,7 @@ class FacadeTest extends \PHPUnit_Framework_TestCase
     public function testUnknownTypeResultsToFailure()
     {
         $content = $this->getContent();
-        $result = $this->getMockBuilder('Valera\Parser\Result\Proxy')
+        $result = $this->getMockBuilder('Valera\Parser\Result')
             ->disableOriginalConstructor()
             ->setMethods(array('fail'))
             ->getMock();

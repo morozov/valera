@@ -4,7 +4,7 @@ namespace Valera\Tests\Parser\Generic;
 
 use Valera\Content;
 use Valera\Parser\ParserInterface;
-use Valera\Parser\Result\Proxy as Result;
+use Valera\Parser\Result;
 
 class Blob implements ParserInterface
 {
@@ -13,7 +13,6 @@ class Blob implements ParserInterface
         $source = $content->getSource();
         $resource = $source->getResource();
         $data = $content->getContent();
-        $result->resolve()
-            ->addBlob($resource, $data);
+        $result->addBlob($resource, $data);
     }
 }

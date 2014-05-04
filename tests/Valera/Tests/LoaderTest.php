@@ -11,16 +11,10 @@ use Valera\Source;
  */
 class LoaderTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->markTestIncomplete();
-    }
-
     public function testSuccessResponse()
     {
         $response = $this->getResponseMock(false);
-        $result = $this->getResultMock('resolve');
+        $result = $this->getResultMock('setContent');
         $source = $this->getSource();
         $this->callProcessResponse($response, $result, $source);
     }
@@ -48,7 +42,7 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
 
     private function getResultMock($expectedMethod)
     {
-        $result = $this->getMockBuilder('Valera\Loader\Result\Proxy')
+        $result = $this->getMockBuilder('Valera\Loader\Result')
             ->disableOriginalConstructor()
             ->getMock();
         $result->expects($this->once())

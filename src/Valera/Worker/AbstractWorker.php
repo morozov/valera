@@ -3,12 +3,10 @@
 namespace Valera\Worker;
 
 use Valera\Queue;
-use Valera\Result\Failure;
-use Valera\Result\Proxy as ResultProxy;
-use Valera\Result\ResultInterface;
-use Valera\Result\Success;
+use Valera\Queueable;
+use Valera\Result;
 
-abstract class AbstractWorker implements WorkerInterface
+abstract class AbstractWorker
 {
     /** @var Queue */
     protected $sourceQueue;
@@ -17,13 +15,15 @@ abstract class AbstractWorker implements WorkerInterface
     /**
      * @var \Valera\Queueable
      */
-    protected $item;
+    protected $current;
 
     public function __construct()
     {
         register_shutdown_function(function() {
-            if ($this->item) {
-                $this->resolveFailed();
+            if ($this->current) {
+                $result = $this->createResult();
+                $result->fail('Script unexpectedly terminated');
+                $this->handleFailure($this->current, $result);
             }
         });
     }
@@ -33,19 +33,22 @@ abstract class AbstractWorker implements WorkerInterface
         $count = 0;
         $queue = $this->getQueue();
         while (count($queue) > 0) {
-            $this->item = $queue->dequeue();
-            $result = $this->process();
-            $this->visit($result);
+            $this->current = $item = $queue->dequeue();
+            $result = $this->createResult();
+            $this->process($item, $result);
+            if ($result->getStatus()) {
+                $this->handleSuccess($item, $result);
+            } else {
+                $this->handleFailure($item, $result);
+            }
             $count++;
 
             // let the shutdown function know there's no item being processed
-            $this->item = null;
+            $this->current = null;
         }
 
         return $count;
     }
-
-    abstract protected function process();
 
     /**
      * @return Queue
@@ -53,27 +56,19 @@ abstract class AbstractWorker implements WorkerInterface
     abstract protected function getQueue();
 
     /**
-     * @return ResultProxy
+     * @return Result
      */
-    abstract protected function getResultProxy();
+    abstract protected function createResult();
 
-    public function visit(ResultInterface $result)
+    abstract protected function process($content, $result);
+
+    protected function handleSuccess($content, $result)
     {
-        $result->accept($this);
+        $this->getQueue()->resolveCompleted($content);
     }
 
-    public function visitSuccess(Success $result)
+    protected function handleFailure($item, $result)
     {
-        $this->getQueue()->resolveCompleted($this->item);
-    }
-
-    public function visitFailure(Failure $result)
-    {
-        $this->resolveFailed();
-    }
-
-    protected function resolveFailed()
-    {
-        $this->getQueue()->resolveFailed($this->item);
+        $this->getQueue()->resolveFailed($item, $result->getMessage());
     }
 }

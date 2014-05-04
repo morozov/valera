@@ -24,7 +24,7 @@ class InMemory implements DocumentStorage
     public function retrieve($id)
     {
         if (isset($this->documents[$id])) {
-            return $this->documents[$id]['data'];
+            return $this->documents[$id];
         }
 
         return null;
