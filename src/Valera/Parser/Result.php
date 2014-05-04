@@ -166,9 +166,6 @@ class Result extends BaseResult
         $this->resolve();
         $resource = new Resource($url, null, $method, $headers, $data);
         $hash = $resource->getHash();
-        if (isset($this->sources[$hash])) {
-            throw new \LogicException('Blob #' . $hash . ' has already been added');
-        }
 
         $this->sources[$hash] = array(
             'type' => $type,

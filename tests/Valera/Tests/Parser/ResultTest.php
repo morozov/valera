@@ -146,14 +146,4 @@ class ResultTest extends \PHPUnit_Framework_TestCase
         ), $sources);
         $this->assertTrue($this->result->getStatus());
     }
-
-    /**
-     * @test
-     * @expectedException \LogicException
-     */
-    public function addSourceDuplicate()
-    {
-        $this->result->addSource('test1', 'http://example.com/');
-        $this->result->addSource('test2', 'http://example.com/');
-    }
 }
