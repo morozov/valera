@@ -2,8 +2,8 @@
 
 namespace Valera;
 
-use Valera\Blob\Local as LocalBlob;
-use Valera\Blob\Remote as RemoteBlob;
+use Valera\Blob;
+use Valera\Resource;
 
 class DocumentIterator
 {
@@ -12,25 +12,25 @@ class DocumentIterator
      *
      * @return array
      */
-    public function findBlobs(array $document)
+    public function findEmbedded(array $document)
     {
-        $blobs = array();
+        $embedded = array();
         $this->iterate($document, function ($value) {
-            return $value instanceof RemoteBlob;
-        }, function (RemoteBlob $value) use (&$blobs) {
-            $blobs[] = $value->getHash();
+            return $value instanceof Resource;
+        }, function (Resource $value) use (&$embedded) {
+            $embedded[] = $value->getHash();
         });
 
-        return $blobs;
+        return $embedded;
     }
 
-    public function convertBlob(array &$document, $hash, $path)
+    public function convertEmbedded(array &$document, Resource $resource, $path)
     {
-        $this->iterate($document, function ($value) use ($hash) {
-            return $value instanceof RemoteBlob
-            && $value->getHash() === $hash;
-        }, function (RemoteBlob &$value) use ($path) {
-            $value = new LocalBlob($path);
+        $this->iterate($document, function ($value) use ($resource) {
+            return $value instanceof Resource
+            && $value->getHash() === $resource->getHash();
+        }, function (Resource &$value) use ($resource, $path) {
+            $value = new Blob($resource, $path);
         });
     }
 

@@ -121,7 +121,7 @@ class Parser extends AbstractWorker
      */
     protected function addDocument($id, array $document)
     {
-        $blobs = $this->iterator->findBlobs($document);
+        $blobs = $this->iterator->findEmbedded($document);
         $this->documentStorage->create($id, $document, $blobs);
         $this->enqueueBlobs($blobs);
     }
@@ -134,7 +134,7 @@ class Parser extends AbstractWorker
     {
         $data = $this->documentStorage->retrieve($id);
         $data = $callback($data);
-        $blobs = $this->iterator->findBlobs($data);
+        $blobs = $this->iterator->findEmbedded($data);
         $this->documentStorage->update($id, $data, $blobs);
         $this->enqueueBlobs($blobs);
     }
@@ -149,8 +149,8 @@ class Parser extends AbstractWorker
         $hash = $resource->getHash();
         $documents = $this->documentStorage->findByBlob($hash);
         foreach ($documents as $id => $document) {
-            $this->iterator->convertBlob($document, $hash, $path);
-            $blobs = $this->iterator->findBlobs($document);
+            $this->iterator->convertEmbedded($document, $hash, $path);
+            $blobs = $this->iterator->findEmbedded($document);
             $this->documentStorage->update($id, $document, $blobs);
         }
     }
