@@ -51,7 +51,7 @@ class DocumentIteratorTest extends \PHPUnit_Framework_TestCase
         $this->iterator->convertEmbedded($document, $resource, '/path/to/image');
 
         $this->assertEquals(array(
-            'image' => new Blob($resource, '/path/to/image'),
+            'image' => new Blob('/path/to/image', $resource),
         ), $document);
     }
 }

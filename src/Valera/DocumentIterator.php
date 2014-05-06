@@ -30,11 +30,11 @@ class DocumentIterator
             return $value instanceof Resource
             && $value->getHash() === $resource->getHash();
         }, function (Resource &$value) use ($resource, $path) {
-            $value = new Blob($resource, $path);
+            $value = new Blob($path, $resource);
         });
     }
 
-    protected function iterate(
+    public function iterate(
         array &$document,
         callable $filter,
         callable $callback

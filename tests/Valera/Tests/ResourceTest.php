@@ -13,7 +13,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://google.com', $resource->getUrl());
         $this->assertEquals('GET', $resource->getMethod());
         $this->assertEquals(array(), $resource->getHeaders());
-        $this->assertEquals(array(), $resource->getData());
+        $this->assertNull($resource->getData());
     }
 
     public function testEquals()

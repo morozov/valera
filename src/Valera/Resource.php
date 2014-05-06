@@ -2,14 +2,11 @@
 
 namespace Valera;
 
-use Valera\Serialize\Serializable;
-use Valera\Serialize\Serializer;
-
 /**
  * Class Resource
  * @package Valera
  */
-class Resource implements Serializable
+final class Resource
 {
     const METHOD_GET = 'GET';
     const METHOD_POST = 'POST';
@@ -24,7 +21,7 @@ class Resource implements Serializable
 
     /**
      * @param $url string URL of the resource
-     * @param Resource $referrer HTTP referer
+     * @param string $referrer HTTP referer
      * @param string $method HTTP method to fetch resource
      * @param array $headers
      * @param array $data
@@ -32,10 +29,10 @@ class Resource implements Serializable
      */
     public function __construct(
         $url,
-        Resource $referrer = null,
+        $referrer = null,
         $method = self::METHOD_GET,
         array $headers = array(),
-        array $data = array()
+        array $data = null
     ) {
         if (!is_string($url)) {
             throw new \InvalidArgumentException(
@@ -88,7 +85,8 @@ class Resource implements Serializable
 
     /**
      * Returns resource referrer
-     * @return Resource
+     *
+     * @return string
      */
     public function getReferrer()
     {
@@ -118,34 +116,6 @@ class Resource implements Serializable
         return $this->data;
     }
 
-    public static function fromArray(array $params)
-    {
-        if (!isset($params['url'])) {
-            throw new \Exception('efwef');
-        }
-        $url = $params['url'];
-
-        if (isset($params['method'])) {
-            $method = $params['method'];
-        } else {
-            $method = self::METHOD_GET;
-        }
-
-        if (isset($params['headers'])) {
-            $headers = $params['headers'];
-        } else {
-            $headers = array();
-        }
-
-        if (isset($params['data'])) {
-            $data = $params['data'];
-        } else {
-            $data = array();
-        }
-
-        return new self($url, null, $method, $headers, $data);
-    }
-
     /**
      * Returns true if given resource is equal to current one
      * @param \Valera\Resource $resource
@@ -171,13 +141,8 @@ class Resource implements Serializable
     /**
      * Hashes resource
      */
-    protected function hash()
+    private function hash()
     {
         $this->hash = md5(serialize($this));
-    }
-
-    public function accept(Serializer $serializer)
-    {
-        return $serializer->serializeResource($this);
     }
 }

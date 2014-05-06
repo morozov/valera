@@ -5,28 +5,28 @@ namespace Valera;
 final class Blob
 {
     /**
-     * @var \Valera\Resource
-     */
-    private $resource;
-
-    /**
      * @var string
      */
     private $path;
 
-    public function __construct(Resource $resource, $path)
-    {
-        $this->resource = $resource;
-        $this->path = $path;
-    }
+    /**
+     * @var \Valera\Resource
+     */
+    private $resource;
 
-    public function getResource()
+    public function __construct($path, Resource $resource)
     {
-        return $this->path;
+        $this->path = $path;
+        $this->resource = $resource;
     }
 
     public function getPath()
     {
         return $this->path;
+    }
+
+    public function getResource()
+    {
+        return $this->resource;
     }
 }

@@ -2,12 +2,10 @@
 
 namespace Valera;
 
-use Valera\Serialize\Serializer;
-
-class Content implements Queueable
+final class Content implements Queueable
 {
-    protected $content;
-    protected $source;
+    private $content;
+    private $source;
 
     public function __construct($content, Source $source)
     {
@@ -40,6 +38,11 @@ class Content implements Queueable
         return $this->source;
     }
 
+    public function getResource()
+    {
+        return $this->source->getResource();
+    }
+
     /**
      * Returns content hash
      *
@@ -48,10 +51,5 @@ class Content implements Queueable
     public function getHash()
     {
         return $this->source->getHash();
-    }
-
-    public function accept(Serializer $serializer)
-    {
-        return $serializer->serializeContent($this);
     }
 }

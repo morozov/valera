@@ -2,9 +2,7 @@
 
 namespace Valera;
 
-use Valera\Serialize\Serializable;
-
-interface Queueable extends Serializable
+interface Queueable
 {
     /**
      * Returns queueable item hash

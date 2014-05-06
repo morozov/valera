@@ -2,12 +2,9 @@
 
 namespace Valera;
 
-use Serializable;
-use Valera\Serialize\Serializer;
-
 /**
  */
-class Source implements Queueable
+final class Source implements Queueable
 {
     /**
      * @var \Valera\Resource
@@ -53,21 +50,6 @@ class Source implements Queueable
         return $this->type;
     }
 
-    public static function fromArray(array $params)
-    {
-        if (!isset($params['resource'])) {
-            throw new \Exception('Source resource is not set');
-        }
-
-        if (!isset($params['type'])) {
-            throw new \Exception('Source type is not set');
-        }
-
-        return new self(
-            $params['type'], Resource::fromArray($params['resource'])
-        );
-    }
-
     /**
      * Returns source hash
      *
@@ -76,10 +58,5 @@ class Source implements Queueable
     public function getHash()
     {
         return $this->resource->getHash();
-    }
-
-    public function accept(Serializer $serializer)
-    {
-        return $serializer->serializeSource($this);
     }
 }
