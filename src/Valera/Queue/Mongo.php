@@ -6,6 +6,7 @@ use MongoCursorException;
 use Valera\Queueable;
 use Valera\Queue;
 use Valera\Queue\Exception\LogicException;
+use Valera\Serializer\SerializerInterface;
 
 /**
  * MongoDB implementation of queue
@@ -15,19 +16,30 @@ use Valera\Queue\Exception\LogicException;
 class Mongo implements Queue
 {
     /**
-     * @var \MongoDB
-     */
-    protected $db;
-
-    /**
      * @var string
      */
     protected $name;
 
     /**
-     * Constructor
+     * @var \MongoDB
      */
-    public function __construct(\MongoDB $db, $name)
+    protected $db;
+
+    /**
+     * @var SerializerInterface
+     */
+    protected $serializer;
+
+    /**
+     * Constructor
+     *
+     * @param string              $name
+     * @param \MongoDB            $db
+     * @param SerializerInterface $serializer
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function __construct($name, \MongoDB $db, SerializerInterface $serializer)
     {
         if (!is_string($name) || $name === '' || !ctype_alnum($name)) {
             throw new \InvalidArgumentException(
@@ -35,8 +47,9 @@ class Mongo implements Queue
             );
         }
 
-        $this->db = $db;
         $this->name = $name;
+        $this->db = $db;
+        $this->serializer = $serializer;
         $this->setUp();
     }
 
@@ -62,7 +75,7 @@ class Mongo implements Queue
         $d = [
             '_id' => $item->getHash(),
             'seq' => $this->getNextSequence('pending'),
-            'data' => serialize($item),
+            'data' => $this->serializer->serialize($item),
         ];
         try {
             /** @var \MongoCollection $pending */
@@ -103,7 +116,7 @@ class Mongo implements Queue
             return null;
         }
 
-        $item = unserialize($ret['data']);
+        $item = $this->serializer->unserialize($ret['data']);
 
         /** @var \MongoCollection $pending */
         $this->addToCollection($item, 'in_progress');
@@ -165,7 +178,7 @@ class Mongo implements Queue
         $items = array();
         $collection = $this->db->{$this->name . '_' . $name}->find();
         foreach ($collection as $document) {
-            $items[] = unserialize($document['data']);
+            $items[] = $this->serializer->unserialize($document['data']);
         }
 
         return $items;
@@ -175,7 +188,7 @@ class Mongo implements Queue
     {
         $this->db->{$this->name . '_' . $name}->insert([
             '_id' => $item->getHash(),
-            'data' => serialize($item),
+            'data' => $this->serializer->serialize($item),
         ]);
     }
 

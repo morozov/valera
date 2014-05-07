@@ -3,7 +3,8 @@
 namespace Valera\Tests\Queue;
 
 use Valera\Queue\Mongo as Queue;
-use Valera\Serialize\ArraySerializer;
+use Valera\Serializer\ResourceSerializer;
+use Valera\Serializer\SourceSerializer;
 use Valera\Tests\Helper;
 
 /**
@@ -14,7 +15,11 @@ class MongoTest extends AbstractTest
     public static function setUpBeforeClass()
     {
         $db = Helper::getMongo();
-        self::$queue = new Queue($db, 'test');
+        $sourceSerializer = new SourceSerializer(
+            new ResourceSerializer()
+        );
+
+        self::$queue = new Queue('test', $db, $sourceSerializer);
 
         parent::setUpBeforeClass();
     }

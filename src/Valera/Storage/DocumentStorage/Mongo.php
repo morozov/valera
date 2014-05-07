@@ -2,16 +2,32 @@
 
 namespace Valera\Storage\DocumentStorage;
 
-use DomainException;
-use MongoDuplicateKeyException;
+use Valera\Serializer\DocumentSerializer;
 use Valera\Storage\BlobStorage;
 use Valera\Storage\DocumentStorage;
 
 class Mongo implements DocumentStorage
 {
-    public function __construct(\MongoDB $db)
+    /**
+     * @var \MongoDB
+     */
+    protected $db;
+
+    /**
+     * @var DocumentSerializer
+     */
+    protected $serializer;
+
+    /**
+     * Constructor
+     *
+     * @param \MongoDB           $db
+     * @param DocumentSerializer $serializer
+     */
+    public function __construct(\MongoDB $db, DocumentSerializer $serializer)
     {
         $this->db = $db;
+        $this->serializer = $serializer;
         $this->db->documents->ensureIndex(array(
             'blobs' => 1,
         ));
@@ -22,11 +38,11 @@ class Mongo implements DocumentStorage
         try {
             $this->db->documents->insert(array(
                 '_id' => $id,
-                'data' => $data,
+                'data' => $this->serialize($data),
                 'blobs' => $blobs,
             ));
-        } catch (MongoDuplicateKeyException $e) {
-            throw new DomainException('Document already exists', 0, $e);
+        } catch (\MongoDuplicateKeyException $e) {
+            throw new \DomainException('Document already exists', 0, $e);
         }
     }
 
@@ -37,7 +53,7 @@ class Mongo implements DocumentStorage
         ));
 
         if ($document) {
-            return $document['data'];
+            return $this->unserialize($document['data']);
         }
 
         return null;
@@ -54,7 +70,7 @@ class Mongo implements DocumentStorage
 
         $result = array();
         foreach ($documents as $document) {
-            $result[$document['_id']] = $document['data'];
+            $result[$document['_id']] = $this->unserialize($document['data']);
         }
 
         return $result;
@@ -66,7 +82,7 @@ class Mongo implements DocumentStorage
             '_id' => $id,
         ), array(
             '_id' => $id,
-            'data' => $data,
+            'data' => $this->serialize($data),
             'blobs' => $blobs,
         ));
     }
@@ -98,6 +114,30 @@ class Mongo implements DocumentStorage
     public function getIterator()
     {
         $cursor = $this->db->documents->find();
-        return new Mongo\Iterator($cursor);
+        return new Mongo\Iterator($cursor, $this->serializer);
+    }
+
+    /**
+     * Serializes document before storing
+     *
+     * @param array $document
+     *
+     * @return array
+     */
+    protected function serialize(array $document)
+    {
+        return $this->serializer->serialize($document);
+    }
+
+    /**
+     * Unserializes document after retrieving
+     *
+     * @param array $params
+     *
+     * @return array
+     */
+    protected function unserialize(array $params)
+    {
+        return $this->serializer->unserialize($params);
     }
 }

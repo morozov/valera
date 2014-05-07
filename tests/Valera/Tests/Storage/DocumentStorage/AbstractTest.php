@@ -2,6 +2,8 @@
 
 namespace Valera\Tests\Storage\DocumentStorage;
 
+use Valera\Tests\Serializer\Helper;
+
 abstract class AbstractTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -155,5 +157,19 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
         // document is not found
         $documents = self::$storage->findByBlob('b2');
         $this->assertCount(0, $documents);
+    }
+
+    /**
+     * @test
+     * @depends create
+     */
+    public function iterator()
+    {
+        $document = Helper::getDocument();
+        self::$storage->create('foo', $document, array());
+        $array = iterator_to_array(self::$storage);
+        $this->assertEquals(array(
+            'foo' => $document,
+        ), $array);
     }
 }
