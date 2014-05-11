@@ -3,6 +3,7 @@
 namespace Valera\Storage\DocumentStorage;
 
 use DomainException;
+use Valera\Resource;
 use Valera\Storage\BlobStorage;
 use Valera\Storage\DocumentStorage;
 
@@ -12,13 +13,13 @@ class InMemory implements DocumentStorage
 
     protected $index = array();
 
-    public function create($id, array $data, array $blobs)
+    public function create($id, array $data, array $resources)
     {
         if (isset($this->documents[$id])) {
             throw new DomainException('Document already exists');
         }
 
-        $this->store($id, $data, $blobs);
+        $this->store($id, $data, $resources);
     }
 
     public function retrieve($id)
@@ -33,24 +34,23 @@ class InMemory implements DocumentStorage
     /**
      * {@inheritDoc}
      */
-    public function findByBlob($hash)
+    public function findByResource(Resource $resource)
     {
-        if (!isset($this->index[$hash])) {
-            return array();
-        }
-
         $documents = array();
-        foreach (array_keys($this->index[$hash]) as $id) {
-            $documents[$id] = $this->retrieve($id);
+        $hash = $resource->getHash();
+        if (isset($this->index[$hash])) {
+            foreach (array_keys($this->index[$hash]) as $id) {
+                $documents[$id] = $this->retrieve($id);
+            }
         }
 
-        return $documents;
+        return new \ArrayIterator($documents);
     }
 
-    public function update($id, array $data, array $blobs)
+    public function update($id, array $data, array $resources)
     {
         if (isset($this->documents[$id])) {
-            $this->store($id, $data, $blobs);
+            $this->store($id, $data, $resources);
         }
     }
 
@@ -78,20 +78,20 @@ class InMemory implements DocumentStorage
     /**
      * @param string $id Document ID
      * @param array $data Document data
-     * @param array $blobs Related blobs
+     * @param Resource[] $resources Embedded resources
      */
-    protected function store($id, array $data, array $blobs)
+    protected function store($id, array $data, array $resources)
     {
         $this->documents[$id] = $data;
 
         $this->removeFromIndex($id);
-        $this->addToIndex($id, $blobs);
+        $this->addToIndex($id, $resources);
     }
     
-    protected function addToIndex($id, $blobs)
+    protected function addToIndex($id, $resources)
     {
-        foreach ($blobs as $hash) {
-            $this->index[$hash][$id] = true;
+        foreach ($resources as $resource) {
+            $this->index[$resource->getHash()][$id] = true;
         }
     }
 

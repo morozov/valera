@@ -2,17 +2,20 @@
 
 namespace Valera\Storage;
 
+use Valera\Resource;
+
 interface DocumentStorage extends \Countable, \IteratorAggregate
 {
-    public function create($id, array $data, array $blobs);
+    public function create($id, array $data, array $resources);
     public function retrieve($id);
 
     /**
-     * @param $hash
-     * @return array
+     * @param Resource $resource
+     *
+     * @return \Iterator
      */
-    public function findByBlob($hash);
-    public function update($id, array $data, array $blobs);
+    public function findByResource(Resource $resource);
+    public function update($id, array $data, array $resources);
     public function delete($id);
     public function clean();
 }

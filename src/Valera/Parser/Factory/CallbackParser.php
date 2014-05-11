@@ -1,8 +1,10 @@
 <?php
 
-namespace Valera\Parser;
+namespace Valera\Parser\Factory;
 
 use Valera\Content;
+use Valera\Parser\ParserInterface;
+use Valera\Parser\Result;
 
 /**
  * Parser that uses callback function as its implementation. Used in order
@@ -10,7 +12,7 @@ use Valera\Content;
  *
  * @see \Valera\Parser\AdapterInterface
  */
-class Callback implements ParserInterface
+class CallbackParser implements ParserInterface
 {
     /**
      * @var callable

@@ -1,17 +1,17 @@
 <?php
 
-namespace Valera\Tests\Parser;
+namespace Valera\Tests\Parser\Factory;
 
 use Valera\Content;
-use Valera\Parser\Callback;
+use Valera\Parser\Factory\CallbackParser;
 use Valera\Parser\Result;
 use Valera\Resource;
 use Valera\Source;
 
 /**
- * @covers \Valera\Parser\Callback
+ * @covers \Valera\Parser\Factory\CallbackParser
  */
-class CallbackTest extends \PHPUnit_Framework_TestCase
+class CallbackParserTest extends \PHPUnit_Framework_TestCase
 {
     public function testImplementationIsCalled()
     {
@@ -25,7 +25,7 @@ class CallbackTest extends \PHPUnit_Framework_TestCase
         $result = new Result();
         $callback->expects($this->once())->method('__invoke')
             ->with($content, $result);
-        $parser = new Callback($callback);
+        $parser = new CallbackParser($callback);
         $parser->parse($content, $result);
     }
 }

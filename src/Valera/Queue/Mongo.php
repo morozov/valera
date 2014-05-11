@@ -72,14 +72,13 @@ class Mongo implements Queue
     /** @inheritDoc */
     public function enqueue(Queueable $item)
     {
-        $d = [
-            '_id' => $item->getHash(),
-            'seq' => $this->getNextSequence('pending'),
-            'data' => $this->serializer->serialize($item),
-        ];
         try {
             /** @var \MongoCollection $pending */
-            $this->db->{$this->name . '_pending'}->insert($d);
+            $this->db->{$this->name . '_pending'}->insert(array(
+                '_id' => $item->getHash(),
+                'seq' => $this->getNextSequence('pending'),
+                'data' => $this->serializer->serialize($item),
+            ));
         } catch (MongoCursorException $e) {
             if ($e->getCode() !== 11000) {
                 throw $e;

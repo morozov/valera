@@ -29,7 +29,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \UnexpectedValueException
+     * @expectedException \InvalidArgumentException
      */
     public function testBadInterface()
     {
@@ -84,7 +84,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
         // adapter found
         $parser1 = $re->invoke($this->factory, array(null));
-        $this->assertInstanceOf('Valera\\Parser\\Callback', $parser1);
+        $this->assertInstanceOf('Valera\\Parser\\Factory\\CallbackParser', $parser1);
 
         // adapter not found
         $this->factory->unregisterAdapter($adapter2);

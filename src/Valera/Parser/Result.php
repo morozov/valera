@@ -161,7 +161,7 @@ class Result extends BaseResult
         $url,
         $method = Resource::METHOD_GET,
         array $headers = array(),
-        array $data = array()
+        $data = null
     ) {
         $this->resolve();
         $resource = new Resource($url, null, $method, $headers, $data);

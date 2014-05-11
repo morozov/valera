@@ -26,6 +26,13 @@ class Helper
         );
     }
 
+    public static function getAnotherResource()
+    {
+        return new Resource(
+            'http://example.net/'
+        );
+    }
+
     public static function getBlob()
     {
         return new Blob('/path/to/blob', self::getResource());

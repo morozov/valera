@@ -2,6 +2,7 @@
 
 namespace Valera\Storage\DocumentStorage;
 
+use Valera\Resource;
 use Valera\Serializer\DocumentSerializer;
 use Valera\Storage\BlobStorage;
 use Valera\Storage\DocumentStorage;
@@ -29,17 +30,17 @@ class Mongo implements DocumentStorage
         $this->db = $db;
         $this->serializer = $serializer;
         $this->db->documents->ensureIndex(array(
-            'blobs' => 1,
+            'embedded' => 1,
         ));
     }
 
-    public function create($id, array $data, array $blobs)
+    public function create($id, array $data, array $resources)
     {
         try {
             $this->db->documents->insert(array(
                 '_id' => $id,
                 'data' => $this->serialize($data),
-                'blobs' => $blobs,
+                'embedded' => $this->getHashes($resources),
             ));
         } catch (\MongoDuplicateKeyException $e) {
             throw new \DomainException('Document already exists', 0, $e);
@@ -62,28 +63,23 @@ class Mongo implements DocumentStorage
     /**
      * {@inheritDoc}
      */
-    public function findByBlob($hash)
+    public function findByResource(Resource $resource)
     {
-        $documents = $this->db->documents->find(array(
-            'blobs' => $hash,
+        $cursor = $this->db->documents->find(array(
+            'embedded' => $resource->getHash(),
         ));
 
-        $result = array();
-        foreach ($documents as $document) {
-            $result[$document['_id']] = $this->unserialize($document['data']);
-        }
-
-        return $result;
+        return $this->getCursorIterator($cursor);
     }
 
-    public function update($id, array $data, array $blobs)
+    public function update($id, array $data, array $resources)
     {
         $this->db->documents->update(array(
             '_id' => $id,
         ), array(
             '_id' => $id,
             'data' => $this->serialize($data),
-            'blobs' => $blobs,
+            'embedded' => $this->getHashes($resources),
         ));
     }
 
@@ -101,6 +97,13 @@ class Mongo implements DocumentStorage
         );
     }
 
+    protected function getHashes(array $resources)
+    {
+        return array_map(function (Resource $resource) {
+            return $resource->getHash();
+        }, $resources);
+    }
+
     public function clean()
     {
         $this->db->documents->drop();
@@ -114,6 +117,16 @@ class Mongo implements DocumentStorage
     public function getIterator()
     {
         $cursor = $this->db->documents->find();
+        return $this->getCursorIterator($cursor);
+    }
+
+    /**
+     * @param \MongoCursor $cursor
+     *
+     * @return Mongo\Iterator
+     */
+    protected function getCursorIterator($cursor)
+    {
         return new Mongo\Iterator($cursor, $this->serializer);
     }
 

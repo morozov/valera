@@ -2,6 +2,7 @@
 
 namespace Valera\Worker;
 
+use Valera\Blob;
 use Valera\DocumentIterator;
 use Valera\Parser\ParserInterface;
 use Valera\Parser\Result as Result;
@@ -93,24 +94,26 @@ class Parser extends AbstractWorker
         }
 
         $resource = $content->getSource()->getResource();
+        $referrer = $resource->getUrl();
         foreach ($result->getBlobs() as $contents) {
-            $this->convertBlob($resource, $contents);
+            $this->convertResource($resource, $contents);
         }
 
         foreach ($result->getSources() as $source) {
-            $this->addSource($source, $resource);
+            $this->addSource(array_merge($source, array(
+                'referrer' => $referrer,
+            )));
         }
 
         parent::handleSuccess($content, $result);
     }
 
     /**
-     * @param \Valera\Blob\Remote[] $blobs
+     * @param \Valera\Resource[] $resources
      */
-    protected function enqueueBlobs(array $blobs)
+    protected function enqueueResources(array $resources)
     {
-        foreach ($blobs as $blob) {
-            $resource = $blob->getResource();
+        foreach ($resources as $resource) {
             $source = new Source(Resource::TYPE_BLOB, $resource);
             $this->sourceQueue->enqueue($source);
         }
@@ -122,9 +125,9 @@ class Parser extends AbstractWorker
      */
     protected function addDocument($id, array $document)
     {
-        $blobs = $this->iterator->findEmbedded($document);
-        $this->documentStorage->create($id, $document, $blobs);
-        $this->enqueueBlobs($blobs);
+        $resources = $this->findResources($document);
+        $this->documentStorage->create($id, $document, $resources);
+        $this->enqueueResources($resources);
     }
 
     /**
@@ -135,41 +138,62 @@ class Parser extends AbstractWorker
     {
         $data = $this->documentStorage->retrieve($id);
         $data = $callback($data);
-        $blobs = $this->iterator->findEmbedded($data);
-        $this->documentStorage->update($id, $data, $blobs);
-        $this->enqueueBlobs($blobs);
+        $resources = $this->findResources($data);
+        $this->documentStorage->update($id, $data, $resources);
+        $this->enqueueResources($resources);
+    }
+
+    /**
+     * @param array $document
+     *
+     * @return array
+     */
+    protected function findResources(array $document)
+    {
+        $resources = array();
+        $this->iterator->iterate($document, function ($value) {
+            return $value instanceof Resource;
+        }, function (Resource $value) use (&$resources) {
+            $resources[] = $value;
+        });
+
+        return $resources;
     }
 
     /**
      * @param \Valera\Resource $resource
      * @param $contents
      */
-    protected function convertBlob(Resource $resource, $contents)
+    protected function convertResource(Resource $resource, $contents)
     {
         $path = $this->blobStorage->create($resource, $contents);
-        $hash = $resource->getHash();
-        $documents = $this->documentStorage->findByBlob($hash);
+        $documents = $this->documentStorage->findByResource($resource);
         foreach ($documents as $id => $document) {
-            $this->iterator->convertEmbedded($document, $hash, $path);
-            $blobs = $this->iterator->findEmbedded($document);
-            $this->documentStorage->update($id, $document, $blobs);
+            $this->iterate($document, function ($value) use ($resource) {
+                return $value instanceof Resource
+                && $value->getHash() === $resource->getHash();
+            }, function (Resource &$value) use ($resource, $path) {
+                $value = new Blob($path, $resource);
+            });
+            $resources = $this->findResources($document);
+            $this->documentStorage->update($id, $document, $resources);
         }
     }
 
     /**
      * @param array $params
-     * @param \Valera\Resource $referrer
      */
-    protected function addSource(array $params, Resource $referrer)
+    protected function addSource(array $params)
     {
         $resource = new Resource(
             $params['url'],
-            $referrer,
+            $params['referrer'],
             $params['method'],
             $params['headers'],
             $params['data']
         );
-        $params = new Source($params['type'], $resource);
-        $this->sourceQueue->enqueue($params);
+
+        $source = new Source($params['type'], $resource);
+        $this->sourceQueue->enqueue($source);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Valera\Parser;
 
-use \UnexpectedValueException;
+use Valera\Parser\Factory\CallbackParser;
 
 /**
  * Parser factory
@@ -20,7 +20,7 @@ class Factory implements FactoryInterface
     protected $namespaces = array();
 
     /**
-     * @var \SplObjectStorage
+     * @var \SplObjectStorage|AdapterInterface[]
      */
     protected $adapters = array();
 
@@ -51,19 +51,34 @@ class Factory implements FactoryInterface
 
         $parser = $this->loadParser($type);
         if ($parser) {
-            if (!$parser instanceof ParserInterface) {
-                $parser = $this->wrap($parser);
-                if (!$parser) {
-                    throw new UnexpectedValueException(
-                        'Parser class is loaded but doesn\'t implement'
-                        . ' ParserInterface and cannot be wrapped into adapter'
-                    );
-                }
-            }
-            $this->parsers[$type] = $parser;
+            $this->registerParser($type, $parser);
         }
 
         return $parser;
+    }
+
+    /**
+     * Registers parser
+     *
+     * @param string $type
+     * @param mixed $parser
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function registerParser($type, $parser)
+    {
+        if (!$parser instanceof ParserInterface) {
+            $parser = $this->wrap($parser);
+        }
+
+        if (!$parser instanceof ParserInterface) {
+            throw new \InvalidArgumentException(
+                'Parser class is loaded but does not implement'
+                . ' ParserInterface and cannot be wrapped into adapter'
+            );
+        }
+
+        $this->parsers[$type] = $parser;
     }
 
     /**
@@ -128,7 +143,7 @@ class Factory implements FactoryInterface
         foreach ($this->adapters as $adapter) {
             if ($adapter->supports($parser)) {
                 $callback = $adapter->wrap($parser);
-                $wrapped = new Callback($callback);
+                $wrapped = new CallbackParser($callback);
                 return $wrapped;
             }
         }

@@ -124,38 +124,42 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
      * @depends update
      * @depends delete
      */
-    public function findByBlob()
+    public function findByResource()
     {
-        self::$storage->create('foo', self::$data, array('b1'));
+        $r1 = Helper::getResource();
+        $r2 = Helper::getAnotherResource();
+        self::$storage->create('foo', self::$data, array($r1));
 
-        // document is found by related blob
-        $documents = self::$storage->findByBlob('b1');
+        // document is found by related resources
+        $documents = self::$storage->findByResource($r1);
+        $documents = iterator_to_array($documents);
         $this->assertCount(1, $documents);
         $this->assertArrayHasKey('foo', $documents);
         $this->assertEquals(self::$data, $documents['foo']);
 
-        // document is not found by unrelated blob
-        $documents = self::$storage->findByBlob('b2');
+        // document is not found by unrelated resources
+        $documents = self::$storage->findByResource($r2);
         $this->assertCount(0, $documents);
 
-        // update document with new related blob
-        self::$storage->update('foo', self::$data, array('b2'));
+        // update document with new related resources
+        self::$storage->update('foo', self::$data, array($r2));
 
-        // document is found by related blob
-        $documents = self::$storage->findByBlob('b2');
+        // document is found by related resources
+        $documents = self::$storage->findByResource($r2);
+        $documents = iterator_to_array($documents);
         $this->assertCount(1, $documents);
         $this->assertArrayHasKey('foo', $documents);
         $this->assertEquals(self::$data, $documents['foo']);
 
-        // document is not found by unrelated blob
-        $documents = self::$storage->findByBlob('b1');
+        // document is not found by unrelated resources
+        $documents = self::$storage->findByResource($r1);
         $this->assertCount(0, $documents);
 
         // delete document
         self::$storage->delete('foo');
 
         // document is not found
-        $documents = self::$storage->findByBlob('b2');
+        $documents = self::$storage->findByResource($r2);
         $this->assertCount(0, $documents);
     }
 
