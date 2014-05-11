@@ -18,7 +18,7 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
     protected static $r2;
 
     /**
-     * @var array
+     * @var string
      */
     protected static $data = 'some-contents';
 
