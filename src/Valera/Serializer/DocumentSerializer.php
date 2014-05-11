@@ -56,11 +56,11 @@ class DocumentSerializer implements SerializerInterface
             return is_object($value);
         }, function (&$value) {
             if ($value instanceof Resource) {
-                $serializer = $this->resourceSerializer;
                 $type = 'resource';
+                $serialized = $this->resourceSerializer->serialize($value);
             } elseif ($value instanceof Blob) {
-                $serializer = $this->blobSerializer;
                 $type = 'blob';
+                $serialized = $this->blobSerializer->serialize($value);
             } else {
                 throw new \UnexpectedValueException(
                     'Unable to serialize embedded ' . get_class($value)
@@ -69,7 +69,7 @@ class DocumentSerializer implements SerializerInterface
 
             $value = array_merge(array(
                 '_type' => $type,
-            ), $serializer->serialize($value));
+            ), $serialized);
         });
 
         return $document;
