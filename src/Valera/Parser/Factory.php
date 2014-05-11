@@ -51,7 +51,7 @@ class Factory implements FactoryInterface
 
         $parser = $this->loadParser($type);
         if ($parser) {
-            $this->registerParser($type, $parser);
+            $parser = $this->registerParser($type, $parser);
         }
 
         return $parser;
@@ -63,6 +63,7 @@ class Factory implements FactoryInterface
      * @param string $type
      * @param mixed $parser
      *
+     * @return ParserInterface
      * @throws \InvalidArgumentException
      */
     public function registerParser($type, $parser)
@@ -79,6 +80,8 @@ class Factory implements FactoryInterface
         }
 
         $this->parsers[$type] = $parser;
+
+        return $parser;
     }
 
     /**

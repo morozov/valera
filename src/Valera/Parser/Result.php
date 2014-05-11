@@ -119,15 +119,16 @@ class Result extends BaseResult
     /**
      * Adds downloaded blob
      *
+     * @param Resources $resource
      * @param string $contents
      *
      * @return static
      * @throws \LogicException
      */
-    public function addBlob($contents)
+    public function addBlob(Resource $resource, $contents)
     {
         $this->resolve();
-        $this->blobs[] = $contents;
+        $this->blobs[] = array($resource, $contents);
 
         return $this;
     }

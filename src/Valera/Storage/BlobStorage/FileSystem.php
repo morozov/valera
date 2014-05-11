@@ -50,10 +50,10 @@ class FileSystem implements BlobStorage
     protected function getPath(Resource $resource)
     {
         $url = $resource->getUrl();
-        $url = preg_replace('/^[a-z0-9]+:\/\/', '', $url);
+        $url = preg_replace('/^[a-z0-9]+:\/\//', '', $url);
         $sections = explode('/', $url);
         $sections = array_map(function ($section) {
-            return rawurlencode($section);
+            return rawurldecode($section);
         }, $sections);
         array_unshift($sections, $this->root);
 

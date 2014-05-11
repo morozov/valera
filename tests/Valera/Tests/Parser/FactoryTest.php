@@ -54,7 +54,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function wrap()
+    public function registerParser()
     {
         $adapter1 = $this->getMockBuilder('Valera\\Parser\\AdapterInterface')
             ->setMethods(array('supports', 'wrap'))
@@ -79,16 +79,13 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $this->factory->registerAdapter($adapter1);
         $this->factory->registerAdapter($adapter2);
 
-        $re = new \ReflectionMethod($this->factory, 'wrap');
-        $re->setAccessible(true);
-
         // adapter found
-        $parser1 = $re->invoke($this->factory, array(null));
+        $parser1 = $this->factory->registerParser('test', null);
         $this->assertInstanceOf('Valera\\Parser\\Factory\\CallbackParser', $parser1);
 
         // adapter not found
         $this->factory->unregisterAdapter($adapter2);
-        $parser2 = $re->invoke($this->factory, array(null));
-        $this->assertNull($parser2);
+        $this->setExpectedException('\InvalidArgumentException');
+        $this->factory->registerParser('test', null);
     }
 }

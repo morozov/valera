@@ -4,6 +4,7 @@ namespace Valera\Tests\Parser;
 
 use Valera\Parser\Result;
 use Valera\Resource;
+use Valera\Tests\Serializer\Helper;
 
 /**
  * @covers \Valera\Parser\Result
@@ -100,11 +101,15 @@ class ResultTest extends \PHPUnit_Framework_TestCase
      */
     public function addBlob()
     {
-        $this->result->addBlob('contents');
+        $resource = Helper::getResource();
+        $this->result->addBlob($resource, 'contents');
         $blobs = $this->result->getBlobs();
 
         $this->assertEquals(array(
-            'contents',
+            array(
+                $resource,
+                'contents',
+            ),
         ), $blobs);
         $this->assertTrue($this->result->getStatus());
     }

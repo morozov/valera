@@ -93,12 +93,12 @@ class Parser extends AbstractWorker
             $this->updateDocument($id, $callback);
         }
 
-        $resource = $content->getSource()->getResource();
-        $referrer = $resource->getUrl();
-        foreach ($result->getBlobs() as $contents) {
+        foreach ($result->getBlobs() as $blob) {
+            list($resource, $contents) = $blob;
             $this->convertResource($resource, $contents);
         }
 
+        $referrer = $content->getSource()->getResource()->getUrl();
         foreach ($result->getSources() as $source) {
             $this->addSource(array_merge($source, array(
                 'referrer' => $referrer,
@@ -162,14 +162,14 @@ class Parser extends AbstractWorker
 
     /**
      * @param \Valera\Resource $resource
-     * @param $contents
+     * @param string $contents
      */
     protected function convertResource(Resource $resource, $contents)
     {
         $path = $this->blobStorage->create($resource, $contents);
         $documents = $this->documentStorage->findByResource($resource);
         foreach ($documents as $id => $document) {
-            $this->iterate($document, function ($value) use ($resource) {
+            $this->iterator->iterate($document, function ($value) use ($resource) {
                 return $value instanceof Resource
                 && $value->getHash() === $resource->getHash();
             }, function (Resource &$value) use ($resource, $path) {
