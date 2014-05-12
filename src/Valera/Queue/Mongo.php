@@ -131,10 +131,12 @@ class Mongo implements Queue
     }
 
     /** @inheritDoc */
-    public function resolveFailed(Queueable $item)
+    public function resolveFailed(Queueable $item, $reason)
     {
         $this->ensureAndRemove($item, 'in_progress');
-        $this->addToCollection($item, 'failed');
+        $this->addToCollection($item, 'failed', array(
+            'reason' => $reason,
+        ));
     }
 
     /** {@inheritDoc} */
@@ -183,12 +185,23 @@ class Mongo implements Queue
         return $items;
     }
 
-    protected function addToCollection(Queueable $item, $name)
-    {
-        $this->db->{$this->name . '_' . $name}->insert([
+    /**
+     * Adds item to specified collection
+     *
+     * @param Queueable $item
+     * @param string $name
+     * @param array $metadata
+     */
+    protected function addToCollection(
+        Queueable $item,
+        $name,
+        array $metadata = array()
+    ) {
+        $document = array_merge(array(
             '_id' => $item->getHash(),
             'data' => $this->serializer->serialize($item),
-        ]);
+        ), $metadata);
+        $this->db->{$this->name . '_' . $name}->insert($document);
     }
 
     protected function ensureAndRemove(Queueable $item, $name)

@@ -99,7 +99,7 @@ class InMemory implements Queue
     }
 
     /** @inheritDoc */
-    public function resolveFailed(Queueable $item)
+    public function resolveFailed(Queueable $item, $reason)
     {
         $hash = $item->getHash();
         $this->stopProgress($hash);

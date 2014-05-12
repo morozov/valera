@@ -37,6 +37,7 @@ ON resource_queue (hash);
 
 CREATE TABLE resource_failed (
   hash VARCHAR(32) NOT NULL,
+  reason VARCHAR(64) NOT NULL,
   FOREIGN KEY(hash) REFERENCES resource(hash) ON DELETE CASCADE
 );
 

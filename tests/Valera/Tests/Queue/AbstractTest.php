@@ -85,7 +85,7 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
         $this->assertContains($s1, self::$queue->getCompleted(), '', false, false);
 
         $s2 = self::$queue->dequeue();
-        self::$queue->resolveFailed($s2);
+        self::$queue->resolveFailed($s2, 'Failure reason');
         $this->assertNotContains($s2, self::$queue->getInProgress(), '', false, false);
         $this->assertNotContains($s2, self::$queue->getCompleted(), '', false, false);
         $this->assertContains($s2, self::$queue->getFailed(), '', false, false);

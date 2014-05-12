@@ -30,6 +30,7 @@ CREATE TABLE resource_completed (
 
 CREATE TABLE resource_failed (
   hash VARCHAR(32) NOT NULL,
+  reason VARCHAR(64) NOT NULL,
   PRIMARY KEY (hash)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

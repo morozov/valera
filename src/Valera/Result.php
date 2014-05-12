@@ -12,11 +12,11 @@ class Result
     protected $status;
 
     /**
-     * Failure message|null
+     * Failure reason
      *
      * @var string
      */
-    protected $message;
+    protected $reason;
 
     public function resolve()
     {
@@ -31,7 +31,14 @@ class Result
         return $this;
     }
 
-    public function fail($message = null)
+    /**
+     * Marks item processing as failed
+     *
+     * @param string $reason Failure reason
+     *
+     * @return static
+     */
+    public function fail($reason)
     {
         if ($this->status === true) {
             throw new \LogicException(
@@ -40,7 +47,7 @@ class Result
         }
 
         $this->status = false;
-        $this->message = $message;
+        $this->reason = $reason;
 
         return $this;
     }
@@ -58,13 +65,15 @@ class Result
     }
 
     /**
-     * @return string|null
+     * Returns failure reason
+     *
+     * @return string
      */
-    public function getMessage()
+    public function getReason()
     {
         $this->ensureFailure();
 
-        return $this->message;
+        return $this->reason;
     }
 
     /**

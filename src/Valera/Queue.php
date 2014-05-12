@@ -36,8 +36,9 @@ interface Queue extends Countable
      * Marks given item processing as failed
      *
      * @param \Valera\Queueable $item
+     * @param string            $reason
      */
-    public function resolveFailed(Queueable $item);
+    public function resolveFailed(Queueable $item, $reason);
 
     /**
      * Cleans the queue

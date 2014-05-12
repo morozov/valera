@@ -31,7 +31,7 @@ class ResultTest extends \PHPUnit_Framework_TestCase
     {
         $this->theResult->fail('Failure reason');
         $this->assertFalse($this->theResult->getStatus());
-        $this->assertEquals('Failure reason', $this->theResult->getMessage());
+        $this->assertEquals('Failure reason', $this->theResult->getReason());
     }
 
     /**
@@ -40,7 +40,7 @@ class ResultTest extends \PHPUnit_Framework_TestCase
      */
     public function ensureSuccess()
     {
-        $this->theResult->fail();
+        $this->theResult->fail('Failure reason');
         $rm = new \ReflectionMethod($this->theResult, 'ensureSuccess');
         $rm->setAccessible(true);
         $rm->invoke($this->theResult);
@@ -53,7 +53,7 @@ class ResultTest extends \PHPUnit_Framework_TestCase
     public function successMessage()
     {
         $this->theResult->resolve();
-        $this->theResult->getMessage();
+        $this->theResult->getReason();
     }
 
     /** @test */
@@ -69,7 +69,7 @@ class ResultTest extends \PHPUnit_Framework_TestCase
     public function resolveThenFail()
     {
         $this->theResult->resolve();
-        $this->theResult->fail();
+        $this->theResult->fail('Failure reason');
     }
 
     /**
@@ -78,7 +78,7 @@ class ResultTest extends \PHPUnit_Framework_TestCase
      */
     public function failThenResolve()
     {
-        $this->theResult->fail();
+        $this->theResult->fail('Failure reason');
         $this->theResult->resolve();
     }
 }

@@ -107,11 +107,13 @@ QUERY;
     }
 
     /** @inheritDoc */
-    public function resolveFailed(Queueable $item)
+    public function resolveFailed(Queueable $item, $reason)
     {
         $this->ensureInCollection($item, 'in_progress');
         $this->removeFromCollection($item, 'in_progress');
-        $this->addToCollection($item, 'failed');
+        $this->addToCollection($item, 'failed', array(
+            'reason' => $reason,
+        ));
     }
 
     /** {@inheritDoc} */
@@ -193,15 +195,37 @@ QUERY;
         return $items;
     }
 
-    protected function addToCollection(Queueable $item, $collection)
-    {
+    /**
+     * Adds item to specified collection
+     *
+     * @param Queueable $item
+     * @param string $name
+     * @param array $metadata
+     */
+    protected function addToCollection(
+        Queueable $item,
+        $name,
+        array $metadata = array()
+    ) {
+        $columns = array('hash');
+        $values = array(':hash' => $item->getHash());
+        foreach ($metadata as $column => $value) {
+            $columns[] = '`' . $column . '`';
+            $values[':' . $column] = $value;
+        }
+
+        $columns = implode(', ', $columns);
+        $placeholders = implode(', ', array_keys($values));
         $query = <<<QUERY
-INSERT INTO {$this->name}_$collection(hash)
-VALUES(:hash)
+INSERT INTO {$this->name}_$name({$columns})
+VALUES({$placeholders})
 QUERY;
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindValue(':hash', $item->getHash());
+        foreach ($values as $placeholder => $value) {
+            $stmt->bindValue($placeholder, $value);
+        }
+
         $stmt->execute();
     }
 

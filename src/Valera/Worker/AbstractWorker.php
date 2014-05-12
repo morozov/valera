@@ -19,7 +19,7 @@ abstract class AbstractWorker
 
     public function __construct()
     {
-        register_shutdown_function(function() {
+        register_shutdown_function(function () {
             if ($this->current) {
                 $result = $this->createResult();
                 $result->fail('Script unexpectedly terminated');
@@ -67,8 +67,14 @@ abstract class AbstractWorker
         $this->getQueue()->resolveCompleted($content);
     }
 
+    /**
+     * Handles item processing failure
+     *
+     * @param Queueable $item
+     * @param Result    $result
+     */
     protected function handleFailure($item, $result)
     {
-        $this->getQueue()->resolveFailed($item, $result->getMessage());
+        $this->getQueue()->resolveFailed($item, $result->getReason());
     }
 }
