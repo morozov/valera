@@ -12,26 +12,26 @@ class ResultTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \Valera\Result
      */
-    private $result;
-    
+    private $theResult;
+
     protected function setUp()
     {
-        $this->result = new Result();
+        $this->theResult = new Result();
     }
 
     /** @test */
     public function resolve()
     {
-        $this->result->resolve();
-        $this->assertTrue($this->result->getStatus());
+        $this->theResult->resolve();
+        $this->assertTrue($this->theResult->getStatus());
     }
 
     /** @test */
     public function fail1()
     {
-        $this->result->fail('Failure reason');
-        $this->assertFalse($this->result->getStatus());
-        $this->assertEquals('Failure reason', $this->result->getMessage());
+        $this->theResult->fail('Failure reason');
+        $this->assertFalse($this->theResult->getStatus());
+        $this->assertEquals('Failure reason', $this->theResult->getMessage());
     }
 
     /**
@@ -40,10 +40,10 @@ class ResultTest extends \PHPUnit_Framework_TestCase
      */
     public function ensureSuccess()
     {
-        $this->result->fail();
-        $rm = new \ReflectionMethod($this->result, 'ensureSuccess');
+        $this->theResult->fail();
+        $rm = new \ReflectionMethod($this->theResult, 'ensureSuccess');
         $rm->setAccessible(true);
-        $rm->invoke($this->result);
+        $rm->invoke($this->theResult);
     }
 
     /**
@@ -52,14 +52,14 @@ class ResultTest extends \PHPUnit_Framework_TestCase
      */
     public function successMessage()
     {
-        $this->result->resolve();
-        $this->result->getMessage();
+        $this->theResult->resolve();
+        $this->theResult->getMessage();
     }
 
     /** @test */
     public function defaultFailed()
     {
-        $this->assertFalse($this->result->getStatus());
+        $this->assertFalse($this->theResult->getStatus());
     }
 
     /**
@@ -68,8 +68,8 @@ class ResultTest extends \PHPUnit_Framework_TestCase
      */
     public function resolveThenFail()
     {
-        $this->result->resolve();
-        $this->result->fail();
+        $this->theResult->resolve();
+        $this->theResult->fail();
     }
 
     /**
@@ -78,7 +78,7 @@ class ResultTest extends \PHPUnit_Framework_TestCase
      */
     public function failThenResolve()
     {
-        $this->result->fail();
-        $this->result->resolve();
+        $this->theResult->fail();
+        $this->theResult->resolve();
     }
 }

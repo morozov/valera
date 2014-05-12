@@ -12,18 +12,18 @@ class ResultTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \Valera\Loader\Result
      */
-    private $result;
+    private $theResult;
 
     protected function setUp()
     {
-        $this->result = new Result();
+        $this->theResult = new Result();
     }
 
     /** @test */
     public function defaults()
     {
-        $this->result->resolve();
-        $this->assertNull($this->result->getContent());
+        $this->theResult->resolve();
+        $this->assertNull($this->theResult->getContent());
     }
 
     /**
@@ -32,20 +32,20 @@ class ResultTest extends \PHPUnit_Framework_TestCase
      */
     public function setContent()
     {
-        $this->result->setContent('content');
-        $content = $this->result->getContent();
+        $this->theResult->setContent('content');
+        $content = $this->theResult->getContent();
 
         $this->assertEquals('content', $content);
-        $this->assertTrue($this->result->getStatus());
+        $this->assertTrue($this->theResult->getStatus());
     }
 
     /**
      * @test
      * @expectedException \LogicException
      */
-    public function setcontentDuplicate()
+    public function setContentDuplicate()
     {
-        $this->result->setContent('content1');
-        $this->result->setContent('content2');
+        $this->theResult->setContent('content1');
+        $this->theResult->setContent('content2');
     }
 }
