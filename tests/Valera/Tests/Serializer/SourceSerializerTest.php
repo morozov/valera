@@ -2,6 +2,8 @@
 
 namespace Valera\Tests\Serializer;
 
+use Valera\Tests\Value\Helper as ValueHelper;
+
 class SourceSerializerTest extends AbstractTest
 {
     public static function setUpBeforeClass()
@@ -13,7 +15,7 @@ class SourceSerializerTest extends AbstractTest
     {
         return array(
             array(
-                Helper::getSource(),
+                ValueHelper::getSource(),
                 Helper::getSerializedSource(),
             ),
         );

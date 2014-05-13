@@ -2,7 +2,7 @@
 
 namespace Valera\Tests\Serializer;
 
-use Valera\Resource;
+use Valera\Tests\Value\Helper as ValueHelper;
 
 class ResourceSerializerTest extends AbstractTest
 {
@@ -15,14 +15,12 @@ class ResourceSerializerTest extends AbstractTest
     {
         return array(
             array(
-                Helper::getResource(),
+                ValueHelper::getResource(),
                 Helper::getSerializedResource(),
             ),
             array(
-                new Resource('http://example/com/'),
-                array(
-                    'url' => 'http://example/com/',
-                ),
+                ValueHelper::getAnotherResource(),
+                Helper::getAnotherSerializedResource(),
             ),
         );
     }

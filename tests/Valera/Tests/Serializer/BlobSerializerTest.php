@@ -2,6 +2,8 @@
 
 namespace Valera\Tests\Serializer;
 
+use Valera\Tests\Value\Helper as ValueHelper;
+
 class BlobSerializerTest extends AbstractTest
 {
     public static function setUpBeforeClass()
@@ -13,11 +15,11 @@ class BlobSerializerTest extends AbstractTest
     {
         return array(
             array(
-                Helper::getBlob(),
+                ValueHelper::getBlob(),
                 Helper::getSerializedBlob(),
             ),
             array(
-                Helper::getAnotherBlob(),
+                ValueHelper::getAnotherBlob(),
                 Helper::getAnotherSerializedBlob(),
             ),
         );

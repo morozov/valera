@@ -3,8 +3,7 @@
 namespace Valera\Tests;
 
 use Valera\Loader;
-use Valera\Resource;
-use Valera\Source;
+use Valera\Tests\Value\Helper;
 
 /**
  * @covers \Valera\Loader
@@ -15,7 +14,7 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
     {
         $response = $this->getResponseMock(false);
         $result = $this->getResultMock('setContent');
-        $source = $this->getSource();
+        $source = Helper::getSource();
         $this->callProcessResponse($response, $result, $source);
     }
 
@@ -23,7 +22,7 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
     {
         $response = $this->getResponseMock(true);
         $result = $this->getResultMock('fail');
-        $source = $this->getSource();
+        $source = Helper::getSource();
         $this->callProcessResponse($response, $result, $source);
     }
 
@@ -49,14 +48,6 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
             ->method($expectedMethod);
 
         return $result;
-    }
-
-    private function getSource()
-    {
-        $resource = new Resource('http://example.com/');
-        $source = new Source('example', $resource);
-
-        return $source;
     }
 
     private function callProcessResponse($response, $result, $source)

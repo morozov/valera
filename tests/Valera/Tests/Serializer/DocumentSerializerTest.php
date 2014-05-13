@@ -2,6 +2,8 @@
 
 namespace Valera\Tests\Serializer;
 
+use Valera\Tests\Value\Helper as ValueHelper;
+
 class DocumentSerializerTest extends AbstractTest
 {
     public static function setUpBeforeClass()
@@ -13,7 +15,7 @@ class DocumentSerializerTest extends AbstractTest
     {
         return array(
             array(
-                Helper::getDocument(),
+                ValueHelper::getDocument(),
                 Helper::getSerializedDocument(),
             ),
         );

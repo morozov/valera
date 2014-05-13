@@ -2,7 +2,7 @@
 
 namespace Valera\Tests\Storage\DocumentStorage;
 
-use Valera\Tests\Serializer\Helper;
+use Valera\Tests\Value\Helper;
 
 abstract class AbstractTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,9 +2,8 @@
 
 namespace Valera\Tests\Queue;
 
-use Valera\Resource;
-use Valera\Source;
 use Valera\Queue;
+use Valera\Tests\Value\Helper;
 
 abstract class AbstractTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,8 +27,8 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
         parent::setUpBeforeClass();
         self::$queue->clean();
 
-        self::$s1 = new Source('product', new Resource('http://example.com/'));
-        self::$s2 = new Source('product', new Resource('http://example.org/'));
+        self::$s1 = Helper::getSource();
+        self::$s2 = Helper::getAnotherSource();
     }
 
     protected function tearDown()

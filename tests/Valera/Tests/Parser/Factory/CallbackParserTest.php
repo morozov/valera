@@ -4,7 +4,7 @@ namespace Valera\Tests\Parser\Factory;
 
 use Valera\Parser\Factory\CallbackParser;
 use Valera\Parser\Result;
-use Valera\Tests\Serializer\Helper;
+use Valera\Tests\Value\Helper;
 
 /**
  * @covers \Valera\Parser\Factory\CallbackParser

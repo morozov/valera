@@ -2,7 +2,7 @@
 
 namespace Valera\Tests\Storage\BlobStorage;
 
-use Valera\Resource;
+use Valera\Tests\Value\Helper;
 
 abstract class AbstractTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,8 +26,8 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUpBeforeClass();
 
-        self::$r1 = new Resource('http://example.com/');
-        self::$r2 = new Resource('http://example.org/');
+        self::$r1 = Helper::getResource();
+        self::$r2 = Helper::getAnotherResource();
         self::$storage->clean();
     }
 

@@ -4,7 +4,7 @@ namespace Valera\Tests\Parser;
 
 use Valera\Parser\ParserInterface;
 use Valera\Parser\Facade;
-use Valera\Tests\Serializer\Helper;
+use Valera\Tests\Value\Helper;
 
 /**
  * @covers \Valera\Parser\Facade
