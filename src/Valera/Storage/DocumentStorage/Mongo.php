@@ -30,18 +30,16 @@ class Mongo implements DocumentStorage
         $this->db = $db;
         $this->serializer = $serializer;
         $this->db->documents->ensureIndex(array(
-            'embedded' => 1,
+            'resources' => 1,
         ));
     }
 
     public function create($id, array $data, array $resources)
     {
         try {
-            $this->db->documents->insert(array(
-                '_id' => $id,
-                'data' => $this->serialize($data),
-                'embedded' => $this->getHashes($resources),
-            ));
+            $this->db->documents->insert(
+                $this->formatDocument($id, $data, $resources)
+            );
         } catch (\MongoDuplicateKeyException $e) {
             throw new \DomainException('Document already exists', 0, $e);
         }
@@ -66,7 +64,7 @@ class Mongo implements DocumentStorage
     public function findByResource(Resource $resource)
     {
         $cursor = $this->db->documents->find(array(
-            'embedded' => $resource->getHash(),
+            'resources' => $resource->getHash(),
         ));
 
         return $this->getCursorIterator($cursor);
@@ -76,11 +74,7 @@ class Mongo implements DocumentStorage
     {
         $this->db->documents->update(array(
             '_id' => $id,
-        ), array(
-            '_id' => $id,
-            'data' => $this->serialize($data),
-            'embedded' => $this->getHashes($resources),
-        ));
+        ), $this->formatDocument($id, $data, $resources));
     }
 
     public function delete($id)
@@ -95,13 +89,6 @@ class Mongo implements DocumentStorage
                 'remove' => true,
             )
         );
-    }
-
-    protected function getHashes(array $resources)
-    {
-        return array_map(function (Resource $resource) {
-            return $resource->getHash();
-        }, $resources);
     }
 
     public function clean()
@@ -152,5 +139,30 @@ class Mongo implements DocumentStorage
     protected function unserialize(array $params)
     {
         return $this->serializer->unserialize($params);
+    }
+
+    /**
+     * Formats document data for internal representation
+     *
+     * @param string $id
+     * @param array $data
+     * @param Resource[] $resources
+     *
+     * @return array
+     */
+    protected function formatDocument($id, array $data, array $resources)
+    {
+        $document = array(
+            '_id' => $id,
+            'data' => $this->serialize($data),
+        );
+
+        if ($resources) {
+            $document['resources'] = array_map(function (Resource $resource) {
+                return $resource->getHash();
+            }, $resources);
+        }
+
+        return $document;
     }
 }
