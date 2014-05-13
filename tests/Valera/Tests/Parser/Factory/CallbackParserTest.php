@@ -2,11 +2,9 @@
 
 namespace Valera\Tests\Parser\Factory;
 
-use Valera\Content;
 use Valera\Parser\Factory\CallbackParser;
 use Valera\Parser\Result;
-use Valera\Resource;
-use Valera\Source;
+use Valera\Tests\Serializer\Helper;
 
 /**
  * @covers \Valera\Parser\Factory\CallbackParser
@@ -18,10 +16,7 @@ class CallbackParserTest extends \PHPUnit_Framework_TestCase
         $callback = $this->getMockBuilder('stdClass')
             ->setMethods(array('__invoke'))
             ->getMock();
-        $content = new Content(
-            'test',
-            new Source('test', new Resource('http://example.com'))
-        );
+        $content = Helper::getContent();
         $result = new Result();
         $callback->expects($this->once())->method('__invoke')
             ->with($content, $result);

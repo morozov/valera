@@ -2,11 +2,9 @@
 
 namespace Valera\Tests\Parser;
 
-use Valera\Content;
 use Valera\Parser\ParserInterface;
 use Valera\Parser\Facade;
-use Valera\Resource;
-use Valera\Source;
+use Valera\Tests\Serializer\Helper;
 
 /**
  * @covers \Valera\Parser\Facade
@@ -15,7 +13,7 @@ class FacadeTest extends \PHPUnit_Framework_TestCase
 {
     public function testImplementationIsCalled()
     {
-        $content = $this->getContent();
+        $content = Helper::getContent();
         $result = $this->getMockBuilder('Valera\Parser\Result')
             ->disableOriginalConstructor()
             ->getMock();
@@ -34,7 +32,7 @@ class FacadeTest extends \PHPUnit_Framework_TestCase
 
     public function testUnknownTypeResultsToFailure()
     {
-        $content = $this->getContent();
+        $content = Helper::getContent();
         $result = $this->getMockBuilder('Valera\Parser\Result')
             ->disableOriginalConstructor()
             ->setMethods(array('fail'))
@@ -57,14 +55,5 @@ class FacadeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($parser));
 
         return $factory;
-    }
-
-    private function getContent()
-    {
-        $resource = new Resource('http://example.com/');
-        $source = new Source('', $resource);
-        $content = new Content('', $source);
-
-        return $content;
     }
 }
