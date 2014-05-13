@@ -2,10 +2,7 @@ language: php
 php:
   - 5.4
   - 5.5
-services:
-  - mongodb
 before_script:
-  - phpenv config-add travis/mongo.ini
   - composer install
   - mysql -e 'create database myapp_test;'
   - mysql myapp_test < data/mysql.sql

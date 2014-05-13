@@ -884,8 +884,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": [],
-    "platform": {
-        "ext-mongo": "*"
-    },
+    "platform": [],
     "platform-dev": []
 }

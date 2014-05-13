@@ -7,6 +7,3 @@ define('VALERA_TESTS_MYSQL_PASSWORD', '');
 
 // SQLite configuration
 define('VALERA_TESTS_SQLITE_DSN', 'sqlite:/tmp/myapp_test.db');
-
-// MongoDB configuration
-define('VALERA_TESTS_MONGO_DB', 'valera');
