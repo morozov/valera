@@ -33,10 +33,17 @@ class ContentSerializer implements SerializerInterface
      */
     public function serialize($content)
     {
-        return array(
+        $serialized = array(
             'content' => $content->getContent(),
             'source' => $this->sourceSerializer->serialize($content->getSource()),
         );
+
+        $mimeType = $content->getMimeType();
+        if ($mimeType !== null) {
+            $serialized['mime_type'] = $mimeType;
+        }
+
+        return $serialized;
     }
 
     /**
@@ -49,8 +56,15 @@ class ContentSerializer implements SerializerInterface
      */
     public function unserialize(array $params)
     {
+        if (isset($params['mime_type'])) {
+            $mimeType = $params['mime_type'];
+        } else {
+            $mimeType = null;
+        }
+
         return new Content(
             $params['content'],
+            $mimeType,
             $this->sourceSerializer->unserialize($params['source'])
         );
     }

@@ -9,7 +9,19 @@ use Valera\Result as BaseResult;
  */
 class Result extends BaseResult
 {
+    /**
+     * Textual content
+     *
+     * @var string
+     */
     protected $content;
+
+    /**
+     * Content MIME type
+     *
+     * @var string|null
+     */
+    protected $mimeType;
 
     /**
      * Returns downloaded content
@@ -24,14 +36,27 @@ class Result extends BaseResult
     }
 
     /**
+     * Returns content MIME type
+     *
+     * @return string|null
+     */
+    public function getMimeType()
+    {
+        $this->ensureSuccess();
+
+        return $this->mimeType;
+    }
+
+    /**
      * Sets downloaded content
      * 
-     * @param string $content
+     * @param string      $content
+     * @param string|null $mimeType
      *
      * @return static
      * @throws \LogicException
      */
-    public function setContent($content)
+    public function setContent($content, $mimeType)
     {
         $this->resolve();
         if ($this->content !== null) {
@@ -39,6 +64,7 @@ class Result extends BaseResult
         }
 
         $this->content = $content;
+        $this->mimeType = $mimeType;
 
         return $this;
     }

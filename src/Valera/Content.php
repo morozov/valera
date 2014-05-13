@@ -2,19 +2,49 @@
 
 namespace Valera;
 
+/**
+ * Downloaded content
+ */
 final class Content implements Queueable
 {
+    /**
+     * String content
+     *
+     * @var string
+     */
     private $content;
+
+    /**
+     * MIME type of the content
+     *
+     * @var string
+     */
+    private $mimeType;
+
+    /**
+     * Content source
+     *
+     * @var Source
+     */
     private $source;
 
-    public function __construct($content, Source $source)
+    /**
+     * Constructor
+     *
+     * @param string      $content
+     * @param string|null $mimeType
+     * @param Source      $source
+     */
+    public function __construct($content, $mimeType, Source $source)
     {
         if (!is_string($content)) {
             throw new \InvalidArgumentException(
                 sprintf('Content must be a string, %s given', gettype($content))
             );
         }
+
         $this->content = $content;
+        $this->mimeType = $mimeType;
         $this->source = $source;
     }
 
@@ -23,19 +53,19 @@ final class Content implements Queueable
         return $this->content;
     }
 
-    public function __toString()
+    public function getMimeType()
     {
-        return $this->getContent();
-    }
-
-    public function getType()
-    {
-        return $this->source->getType();
+        return $this->mimeType;
     }
 
     public function getSource()
     {
         return $this->source;
+    }
+
+    public function getType()
+    {
+        return $this->source->getType();
     }
 
     public function getResource()

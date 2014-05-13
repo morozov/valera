@@ -39,7 +39,10 @@ class Loader implements LoaderInterface
             $result->fail($message);
         } else {
             $body = $response->getBody(true);
-            $result->setContent($body);
+            $result->setContent(
+                $body,
+                $response->getHeader('Content-Type')
+            );
         }
     }
 }

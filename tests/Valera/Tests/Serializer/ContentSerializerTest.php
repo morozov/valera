@@ -18,6 +18,10 @@ class ContentSerializerTest extends AbstractTest
                 ValueHelper::getContent(),
                 Helper::getSerializedContent(),
             ),
+            array(
+                ValueHelper::getAnotherContent(),
+                Helper::getAnotherSerializedContent(),
+            ),
         );
     }
 }

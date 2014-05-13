@@ -52,7 +52,12 @@ class Helper
 
     public static function getContent()
     {
-        return new Content('Lorem ipsum', self::getSource());
+        return new Content('<p>Lorem ipsum</p>', 'text/html; charset=utf-8', self::getSource());
+    }
+
+    public static function getAnotherContent()
+    {
+        return new Content('Hello world!', null, self::getAnotherSource());
     }
 
     public static function getDocument()

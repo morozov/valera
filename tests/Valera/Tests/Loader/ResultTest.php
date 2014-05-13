@@ -32,10 +32,12 @@ class ResultTest extends \PHPUnit_Framework_TestCase
      */
     public function setContent()
     {
-        $this->theResult->setContent('content');
+        $this->theResult->setContent('content', 'text/plain');
         $content = $this->theResult->getContent();
+        $mimeType = $this->theResult->getMimeType();
 
         $this->assertEquals('content', $content);
+        $this->assertEquals('text/plain', $mimeType);
         $this->assertTrue($this->theResult->getStatus());
     }
 
@@ -45,7 +47,7 @@ class ResultTest extends \PHPUnit_Framework_TestCase
      */
     public function setContentDuplicate()
     {
-        $this->theResult->setContent('content1');
-        $this->theResult->setContent('content2');
+        $this->theResult->setContent('content1', null);
+        $this->theResult->setContent('content2', null);
     }
 }

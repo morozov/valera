@@ -83,8 +83,17 @@ class Helper
     public static function getSerializedContent()
     {
         return array(
-            'content' => 'Lorem ipsum',
+            'content' => '<p>Lorem ipsum</p>',
+            'mime_type' => 'text/html; charset=utf-8',
             'source' => self::getSerializedSource(),
+        );
+    }
+
+    public static function getAnotherSerializedContent()
+    {
+        return array(
+            'content' => 'Hello world!',
+            'source' => self::getAnotherSerializedSource(),
         );
     }
 

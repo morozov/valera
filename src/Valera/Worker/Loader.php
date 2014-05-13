@@ -47,6 +47,7 @@ class Loader extends AbstractWorker
         /** @var \Valera\Loader\Result $result */
         $content = new Content(
             $result->getContent(),
+            $result->getMimeType(),
             $source
         );
 
