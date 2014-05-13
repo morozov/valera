@@ -33,10 +33,16 @@ class BlobSerializer implements SerializerInterface
      */
     public function serialize($blob)
     {
-        return array(
+        $serialized = array(
             'path' => $blob->getPath(),
-            'resource' => $this->resourceSerializer->serialize($blob->getResource()),
         );
+
+        $resource = $blob->getResource();
+        if ($resource) {
+            $serialized['resource'] = $this->resourceSerializer->serialize($resource);
+        }
+
+        return $serialized;
     }
 
     /**
@@ -49,9 +55,12 @@ class BlobSerializer implements SerializerInterface
      */
     public function unserialize(array $params)
     {
-        return new Blob(
-            $params['path'],
-            $this->resourceSerializer->unserialize($params['resource'])
-        );
+        if (isset($params['resource'])) {
+            $resource = $this->resourceSerializer->unserialize($params['resource']);
+        } else {
+            $resource = null;
+        }
+
+        return new Blob($params['path'], $resource);
     }
 }

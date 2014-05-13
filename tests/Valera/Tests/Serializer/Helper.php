@@ -38,6 +38,11 @@ class Helper
         return new Blob('/path/to/blob', self::getResource());
     }
 
+    public static function getAnotherBlob()
+    {
+        return new Blob('/path/to/another/blob');
+    }
+
     public static function getSource()
     {
         return new Source('index', self::getResource());
@@ -79,6 +84,13 @@ class Helper
         return array(
             'path' => '/path/to/blob',
             'resource' => self::getSerializedResource(),
+        );
+    }
+
+    public static function getAnotherSerializedBlob()
+    {
+        return array(
+            'path' => '/path/to/another/blob',
         );
     }
 

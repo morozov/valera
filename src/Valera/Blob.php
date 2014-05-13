@@ -14,7 +14,13 @@ final class Blob
      */
     private $resource;
 
-    public function __construct($path, Resource $resource)
+    /**
+     * Constructor
+     *
+     * @param string           $path
+     * @param \Valera\Resource $resource
+     */
+    public function __construct($path, Resource $resource = null)
     {
         $this->path = $path;
         $this->resource = $resource;

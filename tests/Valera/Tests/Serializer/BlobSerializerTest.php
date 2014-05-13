@@ -16,6 +16,10 @@ class BlobSerializerTest extends AbstractTest
                 Helper::getBlob(),
                 Helper::getSerializedBlob(),
             ),
+            array(
+                Helper::getAnotherBlob(),
+                Helper::getAnotherSerializedBlob(),
+            ),
         );
     }
 }
