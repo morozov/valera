@@ -60,7 +60,13 @@ abstract class AbstractWorker
      */
     abstract protected function createResult();
 
-    abstract protected function process($content, $result);
+    /**
+     * Processes item and resolves the result accordingly
+     *
+     * @param \Valera\Queueable $item
+     * @param \Valera\Result $result
+     */
+    abstract protected function process($item, $result);
 
     protected function handleSuccess($content, $result)
     {

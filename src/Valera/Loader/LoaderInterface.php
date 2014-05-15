@@ -2,9 +2,9 @@
 
 namespace Valera\Loader;
 
-use Valera\Source;
+use Valera\Resource;
 
 interface LoaderInterface
 {
-    public function load(Source $source, Result $result);
+    public function load(Resource $resource, Result $result);
 }

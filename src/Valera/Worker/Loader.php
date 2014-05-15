@@ -13,6 +13,10 @@ class Loader extends AbstractWorker
     /** @var Queue */
     protected $sourceQueue;
     protected $contentQueue;
+
+    /**
+     * @var LoaderInterface
+     */
     protected $loader;
 
     public function __construct(
@@ -37,9 +41,16 @@ class Loader extends AbstractWorker
         return new Result();
     }
 
+    /**
+     * Processes source and resolves the result accordingly
+     *
+     * @param \Valera\Source $source
+     * @param \Valera\Loader\Result $result
+     */
     protected function process($source, $result)
     {
-        $this->loader->load($source, $result);
+        $resource = $source->getResource();
+        $this->loader->load($resource, $result);
     }
 
     protected function handleSuccess($source, $result)

@@ -18,9 +18,6 @@
     },
     "files": ["src/bootstrap.php"]
   },
-  "require": {
-    "guzzle/guzzle": "~3.8"
-  },
   "require-dev": {
     "phpunit/phpunit": "~4.0"
   }
