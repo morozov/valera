@@ -12,6 +12,6 @@ class BlobParser implements ParserInterface
     {
         $source = $content->getSource();
         $resource = $source->getResource();
-        $result->addBlob($resource, (string) $content);
+        $result->addBlob($resource, $content->getContent());
     }
 }
