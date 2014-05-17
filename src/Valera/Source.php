@@ -2,6 +2,8 @@
 
 namespace Valera;
 
+use Assert\Assertion;
+
 /**
  */
 final class Source implements Queueable
@@ -17,18 +19,17 @@ final class Source implements Queueable
     private $type;
 
     /**
-     * @param string $type
+     * Constructor
      *
-     * @param \Valera\Resource $resource
-     * @throws \InvalidArgumentException
+     * @param string $type               Source type, the name of the parser that
+     *                                   should be applied to parse its contents
+     * @param \Valera\Resource $resource The HTTP resource representing the source
+     *
+     * @throws \Assert\AssertionFailedException
      */
     public function __construct($type, Resource $resource)
     {
-        if (!is_string($type)) {
-            throw new \InvalidArgumentException(
-                sprintf('Type should be a string, %s given', gettype($type))
-            );
-        }
+        Assertion::string($type);
 
         $this->resource = $resource;
         $this->type = $type;

@@ -114,7 +114,7 @@ class Parser extends AbstractWorker
     protected function enqueueResources(array $resources)
     {
         foreach ($resources as $resource) {
-            $source = new Source(Resource::TYPE_BLOB, $resource);
+            $source = new Source('blob', $resource);
             $this->sourceQueue->enqueue($source);
         }
     }
