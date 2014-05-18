@@ -2,6 +2,7 @@
 
 namespace Valera\Worker;
 
+use Psr\Log\LoggerInterface;
 use Valera\Blob;
 use Valera\DocumentIterator;
 use Valera\Parser\ParserInterface;
@@ -38,6 +39,7 @@ class Parser extends AbstractWorker
     protected $iterator;
 
     public function __construct(
+        LoggerInterface $logger,
         Queue $sourceQueue,
         Queue $contentQueue,
         DocumentStorage $documentStorage,
@@ -45,7 +47,7 @@ class Parser extends AbstractWorker
         ParserInterface $parser,
         DocumentIterator $iterator
     ) {
-        parent::__construct();
+        parent::__construct($contentQueue, $logger);
 
         $this->sourceQueue = $sourceQueue;
         $this->contentQueue = $contentQueue;
@@ -53,11 +55,6 @@ class Parser extends AbstractWorker
         $this->blobStorage = $blobStorage;
         $this->parser = $parser;
         $this->iterator = $iterator;
-    }
-
-    protected function getQueue()
-    {
-        return $this->contentQueue;
     }
 
     protected function createResult()

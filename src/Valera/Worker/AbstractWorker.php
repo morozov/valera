@@ -2,23 +2,43 @@
 
 namespace Valera\Worker;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 use Valera\Queue;
 use Valera\Queueable;
 use Valera\Result;
 
-abstract class AbstractWorker
+/**
+ * Abstract worker implementation. Defines the workflow.
+ */
+abstract class AbstractWorker implements LoggerAwareInterface
 {
-    /** @var Queue */
-    protected $sourceQueue;
-    protected $contentQueue;
+    use LoggerAwareTrait;
+
+    /**
+     * Job queue
+     *
+     * @var \Valera\Queue
+     */
+    protected $queue;
 
     /**
      * @var \Valera\Queueable
      */
     protected $current;
 
-    public function __construct()
+    /**
+     * Constructor
+     *
+     * @param \Valera\Queue            $queue  Job queue
+     * @param \Psr\Log\LoggerInterface $logger Logger
+     */
+    public function __construct(Queue $queue, LoggerInterface $logger)
     {
+        $this->queue = $queue;
+        $this->setLogger($logger);
+
         register_shutdown_function(function () {
             if ($this->current) {
                 $result = $this->createResult();
@@ -30,15 +50,22 @@ abstract class AbstractWorker
 
     public function run()
     {
+        $this->logger->info('Running logger');
+
         $count = 0;
-        $queue = $this->getQueue();
-        while (count($queue) > 0) {
-            $this->current = $item = $queue->dequeue();
+        while (count($this->queue) > 0) {
+            $this->current = $item = $this->queue->dequeue();
+            $hash = $item->getHash();
+
+            $this->logger->info('Item #' . $hash . ' dequeued');
+
             $result = $this->createResult();
             $this->process($item, $result);
             if ($result->getStatus()) {
+                $this->logger->info('Item #' . $hash . ' processed successfully');
                 $this->handleSuccess($item, $result);
             } else {
+                $this->logger->info('Processing item #' . $hash . ' failed');
                 $this->handleFailure($item, $result);
             }
             $count++;
@@ -47,13 +74,10 @@ abstract class AbstractWorker
             $this->current = null;
         }
 
+        $this->logger->info($count . ' items processed');
+
         return $count;
     }
-
-    /**
-     * @return Queue
-     */
-    abstract protected function getQueue();
 
     /**
      * @return Result
@@ -68,9 +92,18 @@ abstract class AbstractWorker
      */
     abstract protected function process($item, $result);
 
-    protected function handleSuccess($content, $result)
+    /**
+     * Handles successful processing of the item
+     *
+     * @param \Valera\Queueable $item
+     * @param \Valera\Result    $result
+     */
+    protected function handleSuccess($item, $result)
     {
-        $this->getQueue()->resolveCompleted($content);
+        $this->logger->info(
+            'Marking item #' . $item->getHash() . ' completed'
+        );
+        $this->queue->resolveCompleted($item);
     }
 
     /**
@@ -81,6 +114,9 @@ abstract class AbstractWorker
      */
     protected function handleFailure($item, $result)
     {
-        $this->getQueue()->resolveFailed($item, $result->getReason());
+        $this->logger->info(
+            'Marking item #' . $this->current->getHash() . ' failed'
+        );
+        $this->queue->resolveFailed($item, $result->getReason());
     }
 }

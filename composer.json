@@ -19,7 +19,8 @@
     "files": ["src/bootstrap.php"]
   },
   "require": {
-    "beberlei/assert": "@stable"
+    "beberlei/assert": "@stable",
+    "monolog/monolog": "~1.9"
   },
   "require-dev": {
     "phpunit/phpunit": "~4.0"
