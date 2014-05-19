@@ -2,7 +2,6 @@
 
 namespace Valera\Worker;
 
-use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Valera\Queue;
@@ -12,7 +11,7 @@ use Valera\Result;
 /**
  * Abstract worker implementation. Defines the workflow.
  */
-abstract class AbstractWorker implements LoggerAwareInterface
+abstract class AbstractWorker implements WorkerInterface
 {
     use LoggerAwareTrait;
 
