@@ -49,33 +49,33 @@ abstract class AbstractWorker implements WorkerInterface
 
     public function run()
     {
-        $this->logger->info('Running logger');
+        $this->logger->info('Running worker');
 
-        $count = 0;
-        while (count($this->queue) > 0) {
-            $this->current = $item = $this->queue->dequeue();
-            $hash = $item->getHash();
-
-            $this->logger->info('Item #' . $hash . ' dequeued');
-
-            $result = $this->createResult();
-            $this->process($item, $result);
-            if ($result->getStatus()) {
-                $this->logger->info('Item #' . $hash . ' processed successfully');
-                $this->handleSuccess($item, $result);
-            } else {
-                $this->logger->info('Processing item #' . $hash . ' failed');
-                $this->handleFailure($item, $result);
-            }
-            $count++;
-
-            // let the shutdown function know there's no item being processed
-            $this->current = null;
+        if (!count($this->queue)) {
+            return 0;
         }
 
-        $this->logger->info($count . ' items processed');
+        $this->current = $item = $this->queue->dequeue();
+        $hash = $item->getHash();
 
-        return $count;
+        $this->logger->info('Item #' . $hash . ' dequeued');
+
+        $result = $this->createResult();
+        $this->process($item, $result);
+        if ($result->getStatus()) {
+            $this->logger->info('Item #' . $hash . ' processed successfully');
+            $this->handleSuccess($item, $result);
+        } else {
+            $this->logger->info('Processing item #' . $hash . ' failed');
+            $this->handleFailure($item, $result);
+        }
+
+        // let the shutdown function know there's no item being processed
+        $this->current = null;
+
+        $this->logger->info('Stopping worker');
+
+        return 1;
     }
 
     /**
