@@ -5,14 +5,15 @@ namespace Valera\Worker;
 use Psr\Log\LoggerAwareInterface;
 
 /**
- * Worker interface
+ * Internal implementation of the worker
  */
 interface WorkerInterface extends LoggerAwareInterface
 {
     /**
-     * Run the worker
+     * Processes single item from queue and resolves result accordingly
      *
-     * @return int The number of processed items
+     * @param \Valera\Queueable     $item
+     * @param \Valera\Worker\Result $result
      */
-    public function run();
+    public function process($item, $result);
 }

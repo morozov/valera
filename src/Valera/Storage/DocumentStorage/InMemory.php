@@ -3,25 +3,36 @@
 namespace Valera\Storage\DocumentStorage;
 
 use DomainException;
+use Valera\Entity\Document;
 use Valera\Resource;
 use Valera\Storage\BlobStorage;
 use Valera\Storage\DocumentStorage;
 
 class InMemory implements DocumentStorage
 {
+    /**
+     * @var \Valera\Entity\Document[]
+     */
     protected $documents = array();
 
     protected $index = array();
 
-    public function create($id, array $data, array $resources)
+    /**
+     * {@inheritDoc}
+     */
+    public function create(Document $document)
     {
+        $id = $document->getId();
         if (isset($this->documents[$id])) {
             throw new DomainException('Document already exists');
         }
 
-        $this->store($id, $data, $resources);
+        $this->store($id, $document, $document->getResources());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function retrieve($id)
     {
         if (isset($this->documents[$id])) {
@@ -47,29 +58,45 @@ class InMemory implements DocumentStorage
         return new \ArrayIterator($documents);
     }
 
-    public function update($id, array $data, array $resources)
+    /**
+     * {@inheritDoc}
+     */
+    public function update(Document $document)
     {
+        $id = $document->getId();
         if (isset($this->documents[$id])) {
-            $this->store($id, $data, $resources);
+            $this->store($id, $document, $document->getResources());
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function delete($id)
     {
         unset($this->documents[$id]);
         $this->removeFromIndex($id);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function clean()
     {
         $this->documents = $this->index = array();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function count()
     {
         return count($this->documents);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getIterator()
     {
         return new \ArrayIterator($this->documents);
@@ -77,12 +104,12 @@ class InMemory implements DocumentStorage
 
     /**
      * @param string $id Document ID
-     * @param array $data Document data
+     * @param \Valera\Entity\Document $document Document
      * @param Resource[] $resources Embedded resources
      */
-    protected function store($id, array $data, array $resources)
+    protected function store($id, Document $document, array $resources)
     {
-        $this->documents[$id] = $data;
+        $this->documents[$id] = $document;
 
         $this->removeFromIndex($id);
         $this->addToIndex($id, $resources);

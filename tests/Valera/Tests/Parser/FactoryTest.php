@@ -6,6 +6,7 @@ use Valera\Parser\Factory;
 
 /**
  * @covers \Valera\Parser\Factory
+ * @uses \Valera\Parser\Factory\CallbackParser
  */
 class FactoryTest extends \PHPUnit_Framework_TestCase
 {

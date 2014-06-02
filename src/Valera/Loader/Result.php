@@ -2,7 +2,7 @@
 
 namespace Valera\Loader;
 
-use Valera\Result as BaseResult;
+use Valera\Worker\Result as BaseResult;
 
 /**
  * Resource loading result

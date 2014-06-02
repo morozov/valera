@@ -1,6 +1,6 @@
 <?php
 
-namespace Valera;
+namespace Valera\Worker;
 
 class Result
 {

@@ -12,7 +12,7 @@ class ResourceSerializer implements SerializerInterface
     /**
      * Creates array representation of resource value object
      *
-     * @param Resource $resource
+     * @param \Valera\Resource $resource
      *
      * @return array
      */

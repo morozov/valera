@@ -8,6 +8,9 @@ use Valera\Tests\Value\Helper;
 
 /**
  * @covers \Valera\Parser\Factory\CallbackParser
+ * @uses \Valera\Content
+ * @uses \Valera\Resource
+ * @uses \Valera\Source
  */
 class CallbackParserTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,7 +3,7 @@
 namespace Valera\Parser;
 
 use Valera\Resource;
-use Valera\Result as BaseResult;
+use Valera\Worker\Result as BaseResult;
 
 /**
  * Text parsing result
@@ -119,8 +119,8 @@ class Result extends BaseResult
     /**
      * Adds downloaded blob
      *
-     * @param Resources $resource
-     * @param string $contents
+     * @param \Valera\Resource $resource
+     * @param string           $contents
      *
      * @return static
      * @throws \LogicException

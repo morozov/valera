@@ -6,6 +6,7 @@ use Valera\Loader\Result;
 
 /**
  * @covers \Valera\Loader\Result
+ * @uses \Valera\Worker\Result
  */
 class ResultTest extends \PHPUnit_Framework_TestCase
 {

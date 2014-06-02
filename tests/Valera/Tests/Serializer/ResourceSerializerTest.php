@@ -4,6 +4,10 @@ namespace Valera\Tests\Serializer;
 
 use Valera\Tests\Value\Helper as ValueHelper;
 
+/**
+ * @covers Valera\Serializer\ResourceSerializer
+ * @uses Valera\Resource
+ */
 class ResourceSerializerTest extends AbstractTest
 {
     public static function setUpBeforeClass()

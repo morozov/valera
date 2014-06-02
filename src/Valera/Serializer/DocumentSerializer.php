@@ -3,7 +3,7 @@
 namespace Valera\Serializer;
 
 use Valera\Blob;
-use Valera\DocumentIterator;
+use Valera\Entity\Document;
 use Valera\Resource;
 
 /**
@@ -11,11 +11,6 @@ use Valera\Resource;
  */
 class DocumentSerializer implements SerializerInterface
 {
-    /**
-     * @var DocumentIterator
-     */
-    protected $documentIterator;
-
     /**
      * @var ResourceSerializer
      */
@@ -29,16 +24,13 @@ class DocumentSerializer implements SerializerInterface
     /**
      * Constructor
      *
-     * @param DocumentIterator   $documentIterator
      * @param ResourceSerializer $resourceSerializer
      * @param BlobSerializer     $blobSerializer
      */
     public function __construct(
-        DocumentIterator $documentIterator,
         ResourceSerializer $resourceSerializer,
         BlobSerializer $blobSerializer
     ) {
-        $this->documentIterator = $documentIterator;
         $this->resourceSerializer = $resourceSerializer;
         $this->blobSerializer = $blobSerializer;
     }
@@ -46,37 +38,21 @@ class DocumentSerializer implements SerializerInterface
     /**
      * Creates array representation of document (not a value object yet)
      *
-     * @param array $document
+     * @param \Valera\Entity\Document $document
      *
      * @return array
      */
     public function serialize($document)
     {
-        $this->documentIterator->iterate($document, function ($value) {
-            return is_object($value);
-        }, function (&$value) {
-            if ($value instanceof Resource) {
-                $type = 'resource';
-                $serialized = $this->resourceSerializer->serialize($value);
-            } elseif ($value instanceof Blob) {
-                $type = 'blob';
-                $serialized = $this->blobSerializer->serialize($value);
-            } else {
-                throw new \UnexpectedValueException(
-                    'Unable to serialize embedded ' . get_class($value)
-                );
-            }
-
-            $value = array_merge(array(
-                '_type' => $type,
-            ), $serialized);
-        });
-
-        return $document;
+        $data = $document->getData();
+        return array(
+            'id' => $document->getId(),
+            'data' => $this->serializeData($data),
+        );
     }
 
     /**
-     * Restores document (not a value object yet) from array representation
+     * Restores document from array representation
      *
      * @param array $params
      *
@@ -84,6 +60,58 @@ class DocumentSerializer implements SerializerInterface
      * @throws \UnexpectedValueException
      */
     public function unserialize(array $params)
+    {
+        $data = $this->unserializeData($params['data']);
+        return new Document($params['id'], $data);
+    }
+
+    /**
+     * Recursively serializes document data
+     *
+     * @param array $data
+     *
+     * @return array
+     * @throws \UnexpectedValueException
+     */
+    private function serializeData(array $data)
+    {
+        $result = array();
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $serialized = $this->serializeData($value);
+            } elseif (is_object($value)) {
+                if ($value instanceof Resource) {
+                    $type = 'resource';
+                    $serialized = $this->resourceSerializer->serialize($value);
+                } elseif ($value instanceof Blob) {
+                    $type = 'blob';
+                    $serialized = $this->blobSerializer->serialize($value);
+                } else {
+                    throw new \UnexpectedValueException(
+                        'Unable to serialize embedded ' . get_class($value)
+                    );
+                }
+
+                $serialized['_type'] = $type;
+            } else {
+                $serialized = $value;
+            }
+
+            $result[$key] = $serialized;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Recursively unserializes document data
+     *
+     * @param array $params
+     *
+     * @return array
+     * @throws \UnexpectedValueException
+     */
+    private function unserializeData(array $params)
     {
         $document = array();
         foreach ($params as $key => $value) {
@@ -102,7 +130,7 @@ class DocumentSerializer implements SerializerInterface
 
                     $value = $serializer->unserialize($value);
                 } else {
-                    $value = $this->unserialize($value);
+                    $value = $this->unserializeData($value);
                 }
             }
 

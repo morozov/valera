@@ -2,15 +2,15 @@
 
 namespace Valera\Tests;
 
-use Valera\Result;
+use Valera\Worker\Result;
 
 /**
- * @covers \Valera\Result
+ * @covers \Valera\Worker\Result
  */
 class ResultTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Valera\Result
+     * @var \Valera\Worker\Result
      */
     private $theResult;
 

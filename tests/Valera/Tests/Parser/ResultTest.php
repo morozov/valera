@@ -8,6 +8,8 @@ use Valera\Tests\Value\Helper;
 
 /**
  * @covers \Valera\Parser\Result
+ * @uses \Valera\Resource
+ * @uses \Valera\Worker\Result
  */
 class ResultTest extends \PHPUnit_Framework_TestCase
 {

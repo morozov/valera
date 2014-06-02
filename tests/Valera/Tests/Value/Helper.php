@@ -4,6 +4,7 @@ namespace Valera\Tests\Value;
 
 use Valera\Blob;
 use Valera\Content;
+use Valera\Entity\Document;
 use Valera\Resource;
 use Valera\Source;
 
@@ -62,7 +63,7 @@ class Helper
 
     public static function getDocument()
     {
-        return array(
+        return new Document('test-document', array(
             'level1' => 'value1',
             'level2' => array(
                 'level21' => 'value21',
@@ -72,6 +73,13 @@ class Helper
                     'image2' => self::getBlob(),
                 ),
             ),
-        );
+        ));
+    }
+
+    public static function getAnotherDocument()
+    {
+        return new Document('another-document', array(
+            'foo' => 'bar',
+        ));
     }
 }

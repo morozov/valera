@@ -1,8 +1,8 @@
 <?php
 
-namespace Valera\Tests\Worker;
+namespace Valera\Tests\Broker;
 
-use Valera\Worker\Sequence;
+use Valera\Broker\Sequence;
 
 /**
  * @cover Valera\Worker\Sequence
@@ -11,9 +11,9 @@ class SequenceTest extends \PHPUnit_Framework_TestCase
 {
     public function testSequence()
     {
-        $w1 = $this->getWorkerMock(array(1, 1, 0, 0));
-        $w2 = $this->getWorkerMock(array(2, 0, 5, 0));
-        $w3 = $this->getWorkerMock(array(0, 3, 0));
+        $w1 = $this->getBrokerMock(array(1, 1, 0, 0));
+        $w2 = $this->getBrokerMock(array(2, 0, 5, 0));
+        $w3 = $this->getBrokerMock(array(0, 3, 0));
 
         $logger = $this->getMock('Psr\\Log\\LoggerInterface');
 
@@ -23,9 +23,9 @@ class SequenceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(12, $count);
     }
 
-    private function getWorkerMock(array $returns)
+    private function getBrokerMock(array $returns)
     {
-        $worker = $this->getMock('Valera\\Worker\\WorkerInterface', array('run', 'setLogger'));
+        $worker = $this->getMock('Valera\\Broker\\BrokerInterface', array('run', 'setLogger'));
         $worker->expects($this->exactly(count($returns)))
             ->method('run')
             ->will(

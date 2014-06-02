@@ -12,16 +12,19 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
     protected static $storage;
 
     /**
-     * @var array
+     * @var \Valera\Entity\Document
      */
-    protected static $data;
+    protected $document;
 
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
         self::$storage->clean();
+    }
 
-        self::$data = array('name' => 'value');
+    public function setUp()
+    {
+        $this->document = Helper::getDocument();
     }
 
     protected function tearDown()
@@ -44,11 +47,12 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
     public function create()
     {
         // document is stored
-        self::$storage->create('foo', self::$data, array());
+        self::$storage->create($this->document);
         $this->assertCount(1, self::$storage);
 
         // another document is stored
-        self::$storage->create('bar', self::$data, array());
+        $d2 = Helper::getAnotherDocument();
+        self::$storage->create($d2);
         $this->assertCount(2, self::$storage);
     }
 
@@ -59,8 +63,8 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
      */
     public function createDuplicate()
     {
-        self::$storage->create('foo', self::$data, array());
-        self::$storage->create('foo', self::$data, array());
+        self::$storage->create($this->document);
+        self::$storage->create($this->document);
     }
 
     /**
@@ -69,15 +73,15 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
      */
     public function retrieve()
     {
-        self::$storage->create('foo', self::$data, array());
+        self::$storage->create($this->document);
 
         // existing document is retrieved
-        $foo = self::$storage->retrieve('foo');
-        $this->assertEquals(self::$data, $foo);
+        $d1 = self::$storage->retrieve($this->document->getId());
+        $this->assertEquals($this->document, $d1);
 
         // retrieval of non-existing document returns NULL
-        $bar = self::$storage->retrieve('bar');
-        $this->assertNull($bar);
+        $unknown = self::$storage->retrieve('unknown');
+        $this->assertNull($unknown);
     }
 
     /**
@@ -87,19 +91,26 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
      */
     public function update()
     {
-        self::$storage->create('foo', self::$data, array());
+        self::$storage->create($this->document);
+
+        $this->document->update(function () {
+            return array(
+                'other' => 'updated',
+            );
+        });
 
         // existing document is updated
-        self::$storage->update('foo', array('other' => 'updated'), array());
-        $foo = self::$storage->retrieve('foo');
+        self::$storage->update($this->document);
+        $document = self::$storage->retrieve($this->document->getId());
         $this->assertEquals(array(
             'other' => 'updated',
-        ), $foo);
+        ), $document->getData());
 
         // non-existing document is not created
-        self::$storage->update('bar', array('other' => 'updated'), array());
-        $bar = self::$storage->retrieve('bar');
-        $this->assertNull($bar);
+        $anotherDocument = Helper::getAnotherDocument();
+        self::$storage->update($anotherDocument);
+        $document = self::$storage->retrieve($anotherDocument->getId());
+        $this->assertNull($document);
     }
 
     /**
@@ -109,12 +120,12 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
      */
     public function delete()
     {
-        self::$storage->create('foo', self::$data, array());
+        self::$storage->create($this->document);
 
         // document is deleted
-        self::$storage->delete('foo');
-        $foo = self::$storage->retrieve('foo');
-        $this->assertNull($foo);
+        self::$storage->delete($this->document->getId());
+        $d1 = self::$storage->retrieve($this->document->getId());
+        $this->assertNull($d1);
     }
 
     /**
@@ -128,35 +139,38 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
     {
         $r1 = Helper::getResource();
         $r2 = Helper::getAnotherResource();
-        self::$storage->create('foo', self::$data, array($r1));
+        self::$storage->create($this->document);
 
         // document is found by related resources
         $documents = self::$storage->findByResource($r1);
         $documents = iterator_to_array($documents);
         $this->assertCount(1, $documents);
-        $this->assertArrayHasKey('foo', $documents);
-        $this->assertEquals(self::$data, $documents['foo']);
+
+        $id = $this->document->getId();
+        $this->assertArrayHasKey($id, $documents);
+        $this->assertEquals($this->document, $documents[$id]);
 
         // document is not found by unrelated resources
         $documents = self::$storage->findByResource($r2);
         $this->assertCount(0, $documents);
 
         // update document with new related resources
-        self::$storage->update('foo', self::$data, array($r2));
+        $this->document->update(function () use ($r2) {
+            return array($r2);
+        });
+        self::$storage->update($this->document);
 
         // document is found by related resources
         $documents = self::$storage->findByResource($r2);
         $documents = iterator_to_array($documents);
         $this->assertCount(1, $documents);
-        $this->assertArrayHasKey('foo', $documents);
-        $this->assertEquals(self::$data, $documents['foo']);
 
         // document is not found by unrelated resources
         $documents = self::$storage->findByResource($r1);
         $this->assertCount(0, $documents);
 
         // delete document
-        self::$storage->delete('foo');
+        self::$storage->delete($id);
 
         // document is not found
         $documents = self::$storage->findByResource($r2);
@@ -169,11 +183,10 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
      */
     public function iterator()
     {
-        $document = Helper::getDocument();
-        self::$storage->create('foo', $document, array());
+        self::$storage->create($this->document);
         $array = iterator_to_array(self::$storage);
         $this->assertEquals(array(
-            'foo' => $document,
+            $this->document->getId() => $this->document,
         ), $array);
     }
 }

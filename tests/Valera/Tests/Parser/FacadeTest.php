@@ -8,6 +8,9 @@ use Valera\Tests\Value\Helper;
 
 /**
  * @covers \Valera\Parser\Facade
+ * @uses \Valera\Content
+ * @uses \Valera\Resource
+ * @uses \Valera\Source
  */
 class FacadeTest extends \PHPUnit_Framework_TestCase
 {

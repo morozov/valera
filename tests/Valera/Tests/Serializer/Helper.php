@@ -2,7 +2,6 @@
 
 namespace Valera\Tests\Serializer;
 
-use Valera\DocumentIterator;
 use Valera\Resource;
 use Valera\Serializer\BlobSerializer;
 use Valera\Serializer\ContentSerializer;
@@ -64,17 +63,20 @@ class Helper
     public static function getSerializedDocument()
     {
         return array(
-            'level1' => 'value1',
-            'level2' => array(
-                'level21' => 'value21',
-                'image1' => array_merge(array(
-                    '_type' => 'resource'
-                ), self::getSerializedResource()),
-                'level3' => array(
-                    'level31' => 'value31',
-                    'image2' => array_merge(array(
-                        '_type' => 'blob'
-                    ), self::getSerializedBlob()),
+            'id' => 'test-document',
+            'data' => array(
+                'level1' => 'value1',
+                'level2' => array(
+                    'level21' => 'value21',
+                    'image1' => array_merge(array(
+                        '_type' => 'resource'
+                    ), self::getSerializedResource()),
+                    'level3' => array(
+                        'level31' => 'value31',
+                        'image2' => array_merge(array(
+                            '_type' => 'blob'
+                        ), self::getSerializedBlob()),
+                    ),
                 ),
             ),
         );
@@ -120,7 +122,6 @@ class Helper
     public static function getDocumentSerializer()
     {
         return new DocumentSerializer(
-            new DocumentIterator(),
             self::getResourceSerializer(),
             self::getBlobSerializer()
         );
