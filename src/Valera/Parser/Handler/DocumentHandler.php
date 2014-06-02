@@ -53,11 +53,11 @@ class DocumentHandler implements ResultHandler
     public function handle($content, $result)
     {
         foreach ($result->getNewDocuments() as $id => $document) {
-            $this->createDocument($id, $document);
+            $this->createDocument((string) $id, $document);
         }
 
         foreach ($result->getUpdatedDocuments() as $id => $callback) {
-            $this->updateDocument($id, $callback);
+            $this->updateDocument((string) $id, $callback);
         }
     }
 
