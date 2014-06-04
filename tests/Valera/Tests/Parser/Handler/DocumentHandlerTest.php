@@ -35,6 +35,11 @@ class DocumentHandlerTest extends \PHPUnit_Framework_TestCase
     private $handler;
 
     /**
+     * @var \Valera\Parser\PostProcessor
+     */
+    private $postProcessor;
+
+    /**
      * @var \Valera\Entity\Document
      */
     private $document;
@@ -49,7 +54,8 @@ class DocumentHandlerTest extends \PHPUnit_Framework_TestCase
         $logger = $this->getMock('Psr\\Log\\LoggerInterface');
         $this->documentStorage = $this->getMock('Valera\\Storage\\DocumentStorage');
         $this->sourceQueue = $this->getMock('Valera\\Queue');
-        $this->handler = new Handler($this->documentStorage, $this->sourceQueue, $logger);
+        $this->postProcessor = $this->getMock('Valera\\Parser\\PostProcessor');
+        $this->handler = new Handler($this->documentStorage, $this->sourceQueue, array($this->postProcessor), $logger);
         $this->document = null;
         $this->source = null;
     }
@@ -90,7 +96,6 @@ class DocumentHandlerTest extends \PHPUnit_Framework_TestCase
         $result = new Result();
         $resource = Helper::getAnotherResource();
         $id = 'test-update';
-        $data = array('qux' => $resource);
         $callback = function () {
         };
         $result->updateDocument($id, $callback);
@@ -111,6 +116,7 @@ class DocumentHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($document));
 
         $this->setUpSourceQueue();
+        $this->setPostProcessor($document);
 
         $content = Helper::getContent();
         $this->handler->handle($content, $result);
@@ -125,6 +131,13 @@ class DocumentHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnCallback(function ($source) {
                 $this->source = $source;
             }));
+    }
+
+    private function setPostProcessor(Document $document)
+    {
+        $this->postProcessor->expects($this->once())
+            ->method('process')
+            ->with($document);
     }
 
     private function assertEnqueuedSource(Resource $resource)

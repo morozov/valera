@@ -28,19 +28,27 @@ class DocumentHandler implements ResultHandler
     protected $sourceQueue;
 
     /**
+     * @var \Valera\Parser\PostProcessor[]
+     */
+    protected $postProcessors = array();
+
+    /**
      * Constructor
      *
      * @param \Valera\Storage\DocumentStorage $documentStorage
      * @param \Valera\Queue                   $sourceQueue
+     * @param \Valera\Parser\PostProcessor[]  $postProcessors
      * @param \Psr\Log\LoggerInterface        $logger
      */
     public function __construct(
         DocumentStorage $documentStorage,
         Queue $sourceQueue,
+        array $postProcessors,
         LoggerInterface $logger
     ) {
         $this->documentStorage = $documentStorage;
         $this->sourceQueue = $sourceQueue;
+        $this->postProcessors = $postProcessors;
         $this->setLogger($logger);
     }
 
@@ -71,7 +79,7 @@ class DocumentHandler implements ResultHandler
     {
         $document = new Document($id, $data);
         $this->documentStorage->create($document);
-        $this->enqueueResources($document->getResources());
+        $this->postProcess($document);
     }
 
     /**
@@ -85,8 +93,22 @@ class DocumentHandler implements ResultHandler
         $document = $this->documentStorage->retrieve($id);
         if ($document) {
             $document->update($callback);
-            $this->enqueueResources($document->getResources());
+            $this->postProcess($document);
         }
+    }
+
+    /**
+     * Post-processes document data
+     *
+     * @param Document $document
+     */
+    protected function postProcess(Document $document)
+    {
+        foreach ($this->postProcessors as $postProcessor) {
+            $postProcessor->process($document);
+        }
+
+        $this->enqueueResources($document->getResources());
     }
 
     /**

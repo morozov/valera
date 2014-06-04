@@ -127,13 +127,13 @@ class Document
      * @param callable $filter   Applied to leaf value
      * @param callable $callback Called with values of filtered leaves
      */
-    private function iterate(
+    public function iterate(
         callable $filter,
         callable $callback
     ) {
-        array_walk_recursive($this->data, function (&$value) use ($filter, $callback) {
+        array_walk_recursive($this->data, function (&$value, $key) use ($filter, $callback) {
             if ($filter($value)) {
-                $callback($value);
+                $callback($value, array($key));
             }
         });
     }
