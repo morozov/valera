@@ -22,11 +22,11 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testParserLoaded()
     {
-        $parser1 = $this->factory->getParser('parser1');
-        $this->assertInstanceOf('\\Valera\\Tests\\Parser\\Factory\\Parser1', $parser1);
+        $parser = $this->factory->getParser('some-parser');
+        $this->assertInstanceOf('\\Valera\\Tests\\Parser\\Factory\\SomeParser', $parser);
 
-        $parser2 = $this->factory->getParser('parser2');
-        $this->assertNull($parser2);
+        $parser = $this->factory->getParser('unknown-parser');
+        $this->assertNull($parser);
     }
 
     /**

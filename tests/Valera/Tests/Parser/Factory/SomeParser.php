@@ -6,7 +6,7 @@ use Valera\Content;
 use Valera\Parser\ParserInterface;
 use Valera\Parser\Result;
 
-class Parser1 implements ParserInterface
+class SomeParser implements ParserInterface
 {
     public function parse(Content $content, Result $result)
     {
