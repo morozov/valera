@@ -50,7 +50,7 @@ class ResourceSerializer implements SerializerInterface
      *
      * @param array $params
      *
-     * @return Resource
+     * @return \Valera\Resource
      * @throws \InvalidArgumentException
      */
     public function unserialize(array $params)

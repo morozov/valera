@@ -6,7 +6,7 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Valera\Queue;
 use Valera\Resource;
-use Valera\Source;
+use Valera\Source\DocumentSource;
 use Valera\Worker\ResultHandler;
 
 /**
@@ -69,7 +69,7 @@ class SourceHandler implements ResultHandler
             $params['data']
         );
 
-        $source = new Source($params['type'], $resource);
+        $source = new DocumentSource($params['type'], $resource);
         $this->sourceQueue->enqueue($source);
     }
 }

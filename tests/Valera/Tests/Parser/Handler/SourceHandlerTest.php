@@ -13,6 +13,7 @@ use Valera\Tests\Value\Helper;
  * @uses \Valera\Parser\Result
  * @uses \Valera\Resource
  * @uses \Valera\Source
+ * @uses \Valera\Source\DocumentSource
  * @uses \Valera\Worker\Result
  */
 class SourceHandlerTest extends \PHPUnit_Framework_TestCase

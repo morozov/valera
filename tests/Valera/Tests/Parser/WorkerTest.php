@@ -10,6 +10,7 @@ use Valera\Tests\Value\Helper;
  * @uses \Valera\Content
  * @uses \Valera\Resource
  * @uses \Valera\Source
+ * @uses \Valera\Source\DocumentSource
  */
 class WorkerTest extends \PHPUnit_Framework_TestCase
 {

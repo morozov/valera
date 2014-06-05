@@ -6,7 +6,8 @@ use Valera\Blob;
 use Valera\Content;
 use Valera\Entity\Document;
 use Valera\Resource;
-use Valera\Source;
+use Valera\Source\BlobSource;
+use Valera\Source\DocumentSource;
 
 /**
  * Unit test helper for value objects
@@ -41,24 +42,29 @@ class Helper
         return new Blob('/path/to/another/blob');
     }
 
-    public static function getSource()
+    public static function getBlobSource()
     {
-        return new Source('index', self::getResource());
+        return new BlobSource(self::getResource());
     }
 
-    public static function getAnotherSource()
+    public static function getDocumentSource()
     {
-        return new Source('default', self::getAnotherResource());
+        return new DocumentSource('index', self::getResource());
+    }
+
+    public static function getAnotherDocumentSource()
+    {
+        return new DocumentSource('default', self::getAnotherResource());
     }
 
     public static function getContent()
     {
-        return new Content('<p>Lorem ipsum</p>', 'text/html; charset=utf-8', self::getSource());
+        return new Content('<p>Lorem ipsum</p>', 'text/html; charset=utf-8', self::getDocumentSource());
     }
 
     public static function getAnotherContent()
     {
-        return new Content('Hello world!', null, self::getAnotherSource());
+        return new Content('Hello world!', null, self::getAnotherDocumentSource());
     }
 
     public static function getDocument()

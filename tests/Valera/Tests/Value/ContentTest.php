@@ -8,7 +8,7 @@ class ContentTest extends \PHPUnit_Framework_TestCase
 {
     public function testApi()
     {
-        $source = Helper::getSource();
+        $source = Helper::getDocumentSource();
         $content = new Content('content-test', 'text/plain', $source);
 
         $this->assertEquals('content-test', $content->getContent());

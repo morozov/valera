@@ -9,6 +9,7 @@ use Valera\Tests\Value\Helper as ValueHelper;
  * @uses Valera\Resource
  * @uses Valera\Serializer\ResourceSerializer
  * @uses Valera\Source
+ * @uses Valera\Source\DocumentSource
  */
 class SourceSerializerTest extends AbstractTest
 {
@@ -21,8 +22,12 @@ class SourceSerializerTest extends AbstractTest
     {
         return array(
             array(
-                ValueHelper::getSource(),
-                Helper::getSerializedSource(),
+                ValueHelper::getDocumentSource(),
+                Helper::getSerializedDocumentSource(),
+            ),
+            array(
+                ValueHelper::getBlobSource(),
+                Helper::getSerializedBlobSource(),
             ),
         );
     }

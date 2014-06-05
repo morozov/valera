@@ -2,11 +2,11 @@
 
 namespace Valera;
 
-use Assert\Assertion;
-
 /**
+ * Base class for data sources. Contains origin resources. Derived classes may defined additional attributes
+ * for data processing.
  */
-final class Source implements Queueable
+abstract class Source implements Queueable
 {
     /**
      * @var \Valera\Resource
@@ -14,25 +14,15 @@ final class Source implements Queueable
     private $resource;
 
     /**
-     * @var string
-     */
-    private $type;
-
-    /**
      * Constructor
      *
-     * @param string $type               Source type, the name of the parser that
-     *                                   should be applied to parse its contents
      * @param \Valera\Resource $resource The HTTP resource representing the source
      *
      * @throws \Assert\AssertionFailedException
      */
-    public function __construct($type, Resource $resource)
+    public function __construct(Resource $resource)
     {
-        Assertion::string($type);
-
         $this->resource = $resource;
-        $this->type = $type;
     }
 
     /**
@@ -41,14 +31,6 @@ final class Source implements Queueable
     public function getResource()
     {
         return $this->resource;
-    }
-
-    /**
-     * Returns the type of the source
-     */
-    public function getType()
-    {
-        return $this->type;
     }
 
     /**

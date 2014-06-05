@@ -2,14 +2,14 @@
 
 namespace Valera\Tests\Value;
 
-use Valera\Source;
+use Valera\Source\DocumentSource;
 
-class SourceTest extends \PHPUnit_Framework_TestCase
+class DocumentSourceTest extends \PHPUnit_Framework_TestCase
 {
     public function testApi()
     {
         $resource = Helper::getResource();
-        $source = new Source('source-test', $resource);
+        $source = new DocumentSource('source-test', $resource);
 
         $this->assertEquals('source-test', $source->getType());
         $this->assertEquals($resource, $source->getResource());

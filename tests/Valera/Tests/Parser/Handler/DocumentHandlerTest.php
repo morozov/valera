@@ -15,6 +15,7 @@ use Valera\Tests\Value\Helper;
  * @uses \Valera\Parser\Result
  * @uses \Valera\Resource
  * @uses \Valera\Source
+ * @uses \Valera\Source\DocumentSource
  * @uses \Valera\Worker\Result
  */
 class DocumentHandlerTest extends \PHPUnit_Framework_TestCase
@@ -142,8 +143,7 @@ class DocumentHandlerTest extends \PHPUnit_Framework_TestCase
 
     private function assertEnqueuedSource(Resource $resource)
     {
-        $this->assertInstanceOf('Valera\\Source', $this->source);
-        $this->assertEquals('blob', $this->source->getType());
+        $this->assertInstanceOf('Valera\\Source\\BlobSource', $this->source);
         $this->assertEquals($resource, $this->source->getResource());
     }
 }

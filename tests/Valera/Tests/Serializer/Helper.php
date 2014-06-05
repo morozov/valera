@@ -44,7 +44,14 @@ class Helper
         );
     }
 
-    public static function getSerializedSource()
+    public static function getSerializedBlobSource()
+    {
+        return array(
+            'resource' => self::getSerializedResource(),
+        );
+    }
+
+    public static function getSerializedDocumentSource()
     {
         return array(
             'type' => 'index',
@@ -52,7 +59,7 @@ class Helper
         );
     }
 
-    public static function getAnotherSerializedSource()
+    public static function getAnotherSerializedDocumentSource()
     {
         return array(
             'type' => 'default',
@@ -87,7 +94,7 @@ class Helper
         return array(
             'content' => '<p>Lorem ipsum</p>',
             'mime_type' => 'text/html; charset=utf-8',
-            'source' => self::getSerializedSource(),
+            'source' => self::getSerializedDocumentSource(),
         );
     }
 
@@ -95,7 +102,7 @@ class Helper
     {
         return array(
             'content' => 'Hello world!',
-            'source' => self::getAnotherSerializedSource(),
+            'source' => self::getAnotherSerializedDocumentSource(),
         );
     }
 

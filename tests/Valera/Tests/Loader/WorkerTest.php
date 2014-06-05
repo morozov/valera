@@ -9,6 +9,7 @@ use Valera\Tests\Value\Helper;
  * @covers \Valera\Loader\Worker
  * @uses \Valera\Resource
  * @uses \Valera\Source
+ * @uses \Valera\Source\DocumentSource
  */
 class WorkerTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,7 +33,7 @@ class WorkerTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function process()
     {
-        $source = Helper::getSource();
+        $source = Helper::getDocumentSource();
         $result = $this->getMock('Valera\\Loader\\Result');
         $this->loader->expects($this->once())
             ->method('load')

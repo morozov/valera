@@ -27,8 +27,8 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
         parent::setUpBeforeClass();
         self::$queue->clean();
 
-        self::$s1 = Helper::getSource();
-        self::$s2 = Helper::getAnotherSource();
+        self::$s1 = Helper::getDocumentSource();
+        self::$s2 = Helper::getAnotherDocumentSource();
     }
 
     protected function tearDown()

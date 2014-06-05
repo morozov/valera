@@ -2,7 +2,8 @@
 
 namespace Valera\Serializer;
 
-use Valera\Source;
+use Valera\Source\BlobSource;
+use Valera\Source\DocumentSource;
 
 /**
  * Source value object serializer
@@ -27,16 +28,21 @@ class SourceSerializer implements SerializerInterface
     /**
      * Creates array representation of source value object
      *
-     * @param Source $source
+     * @param \Valera\Source $source
      *
      * @return array
      */
     public function serialize($source)
     {
-        return array(
-            'type' => $source->getType(),
+        $serialized = array(
             'resource' => $this->resourceSerializer->serialize($source->getResource()),
         );
+
+        if ($source instanceof DocumentSource) {
+            $serialized['type'] = $source->getType();
+        }
+
+        return $serialized;
     }
 
     /**
@@ -44,14 +50,18 @@ class SourceSerializer implements SerializerInterface
      *
      * @param array $params
      *
-     * @return Source
+     * @return \Valera\Source
      * @throws \InvalidArgumentException
      */
     public function unserialize(array $params)
     {
-        return new Source(
-            $params['type'],
-            $this->resourceSerializer->unserialize($params['resource'])
-        );
+        $resource = $this->resourceSerializer->unserialize($params['resource']);
+        if (isset($params['type'])) {
+            $source = new DocumentSource($params['type'], $resource);
+        } else {
+            $source = new BlobSource($resource);
+        }
+
+        return $source;
     }
 }

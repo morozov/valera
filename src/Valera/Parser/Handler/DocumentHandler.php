@@ -6,7 +6,7 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Valera\Entity\Document;
 use Valera\Queue;
-use Valera\Source;
+use Valera\Source\BlobSource;
 use Valera\Storage\DocumentStorage;
 use Valera\Worker\ResultHandler;
 
@@ -119,7 +119,7 @@ class DocumentHandler implements ResultHandler
     protected function enqueueResources(array $resources)
     {
         foreach ($resources as $resource) {
-            $source = new Source('blob', $resource);
+            $source = new BlobSource($resource);
             $this->sourceQueue->enqueue($source);
         }
     }
