@@ -29,7 +29,7 @@ class SourceHandlerTest extends \PHPUnit_Framework_TestCase
     private $handler;
 
     /**
-     * @var \Valera\Source
+     * @var \Valera\Source\DocumentSource
      */
     private $source;
 

@@ -26,7 +26,7 @@ final class Content implements Queueable
     /**
      * Content source
      *
-     * @var Source
+     * @var \Valera\Source\DocumentSource
      */
     private $source;
 
