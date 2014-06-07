@@ -10,9 +10,11 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
     {
         $resource = new Resource('http://google.com');
         $this->assertEquals('http://google.com', $resource->getUrl());
+        $this->assertEquals(null, $resource->getReferrer());
         $this->assertEquals(Resource::METHOD_GET, $resource->getMethod());
         $this->assertEquals(array(), $resource->getHeaders());
         $this->assertNull($resource->getData());
+        $this->assertInternalType('string', $resource->getHash());
     }
 
     /**
@@ -37,5 +39,13 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
     public function testValidationFailed()
     {
         new Resource('not an url');
+    }
+
+    public function testRelativeUrl()
+    {
+        $resource = new Resource('path', 'http://example.com/');
+
+        $this->assertEquals('path', $resource->getUrl());
+        $this->assertEquals('http://example.com/', $resource->getReferrer());
     }
 }
