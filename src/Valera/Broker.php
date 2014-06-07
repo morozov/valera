@@ -89,7 +89,7 @@ class Broker implements BrokerInterface
         $this->logger->info('Item #' . $hash . ' dequeued');
 
         $result = $this->createResult();
-        $this->worker->process($item, $result);
+        $this->process($item, $result);
         if ($result->getStatus()) {
             $this->logger->info('Item #' . $hash . ' processed successfully');
             $this->handleSuccess($item, $result);
@@ -112,6 +112,23 @@ class Broker implements BrokerInterface
     protected function createResult()
     {
         return clone $this->result;
+    }
+
+    /**
+     * Processes single item from queue and resolves result accordingly
+     *
+     * @param \Valera\Queueable     $item
+     * @param \Valera\Worker\Result $result
+     */
+    protected function process(Queueable $item, Result $result)
+    {
+        try {
+            $this->worker->process($item, $result);
+        } catch (\LogicException $e) {
+            // transform only logic exceptions to failures
+            // and let run-time exceptions fall through
+            $result->fail('Exception: ' . $e->getMessage());
+        }
     }
 
     /**

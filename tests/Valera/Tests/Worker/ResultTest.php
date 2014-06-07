@@ -64,12 +64,12 @@ class ResultTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \LogicException
      */
     public function resolveThenFail()
     {
         $this->theResult->resolve();
         $this->theResult->fail('Failure reason');
+        $this->assertEquals('Failure reason', $this->theResult->getReason());
     }
 
     /**

@@ -90,6 +90,25 @@ class BrokerTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function logicException()
+    {
+        $item = $this->getItem();
+        $this->enqueueItem($item);
+        $this->setQueueCount(1);
+
+        $this->handler->expects($this->never())
+            ->method('handle');
+
+        $this->queue->expects($this->once())
+            ->method('resolveFailed')
+            ->with($item, $this->stringStartsWith('Exception'));
+
+        $this->processItem($item, function () {
+            throw new \LogicException;
+        });
+    }
+
+    /** @test */
     public function handleUnexpectedExit()
     {
         $item = $this->getItem();

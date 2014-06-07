@@ -40,12 +40,6 @@ class Result
      */
     public function fail($reason)
     {
-        if ($this->status === true) {
-            throw new \LogicException(
-                'Result is already marked as successful'
-            );
-        }
-
         $this->status = false;
         $this->reason = $reason;
 
