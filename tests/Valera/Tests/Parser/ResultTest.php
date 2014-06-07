@@ -8,6 +8,7 @@ use Valera\Tests\Value\Helper;
 
 /**
  * @covers \Valera\Parser\Result
+ * @covers \Valera\Worker\Result
  * @uses \Valera\Resource
  * @uses \Valera\Worker\Result
  */
