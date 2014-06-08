@@ -15,7 +15,10 @@
   "autoload": {
     "psr-0": {
       "Valera": "src/"
-    }
+    },
+    "classmap": [
+      "lib/"
+    ]
   },
   "require": {
     "beberlei/assert": "@stable",

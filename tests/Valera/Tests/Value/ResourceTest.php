@@ -44,8 +44,12 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
     public function testRelativeUrl()
     {
         $resource = new Resource('path', 'http://example.com/');
+        $this->assertEquals('http://example.com/path', $resource->getUrl());
+    }
 
-        $this->assertEquals('path', $resource->getUrl());
-        $this->assertEquals('http://example.com/', $resource->getReferrer());
+    public function testAbsoluteUrlWithReferrer()
+    {
+        $resource = new Resource('http://example.org/', 'http://example.com/');
+        $this->assertEquals('http://example.org/', $resource->getUrl());
     }
 }

@@ -36,14 +36,15 @@ final class Resource
         array $headers = array(),
         $data = null
     ) {
-        if ($referrer === null) {
-            // in case if referrer is not specified, the URL must be absolute
-            Assertion::url($url);
-        } else {
-            // otherwise referrer itself must be absolute URL
+        if ($referrer !== null) {
+            Assertion::string($url);
             Assertion::url($referrer);
+
+            // make URL absolute based on referrer and relative URL
+            $url = \phpUri::parse($referrer)->join($url);
         }
 
+        Assertion::url($url);
         Assertion::string($method);
         $method = strtoupper($method);
         Assertion::inArray($method, array(self::METHOD_GET, self::METHOD_POST));
