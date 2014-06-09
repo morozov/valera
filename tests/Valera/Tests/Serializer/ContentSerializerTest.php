@@ -8,6 +8,7 @@ use Valera\Tests\Value\Helper as ValueHelper;
  * @covers Valera\Serializer\ContentSerializer
  * @uses Valera\Content
  * @uses Valera\Resource
+ * @uses Valera\Value\ResourceData
  * @uses Valera\Source
  * @uses Valera\Source\DocumentSource
  * @uses Valera\Serializer\ResourceSerializer

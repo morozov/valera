@@ -44,7 +44,7 @@ class SourceHandler implements ResultHandler
     public function handle($content, $result)
     {
         /** @var \Valera\Content $content */
-        $referrer = $content->getSource()->getResource()->getUrl();
+        $referrer = $content->getResource()->getUrl();
 
         /** @var \Valera\Parser\Result $result */
         foreach ($result->getSources() as $source) {
@@ -66,7 +66,7 @@ class SourceHandler implements ResultHandler
             $params['referrer'],
             $params['method'],
             $params['headers'],
-            $params['data']
+            $params['payload']
         );
 
         $source = new DocumentSource($params['type'], $resource);

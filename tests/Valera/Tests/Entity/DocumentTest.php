@@ -3,12 +3,16 @@
 namespace Valera\Tests\Entity;
 
 use Valera\Entity\Document;
+use Valera\Resource;
 use Valera\Tests\Value\Helper;
+use Valera\Value\Reference;
 
 /**
  * @covers Valera\Entity\Document
  * @uses Valera\Blob
  * @uses Valera\Resource
+ * @uses Valera\Value\Reference
+ * @uses Valera\Value\ResourceData
  */
 class DocumentTest extends \PHPUnit_Framework_TestCase
 {
@@ -85,5 +89,30 @@ class DocumentTest extends \PHPUnit_Framework_TestCase
             ),
         ), $document->getData());
         $this->assertTrue($document->isDirty());
+    }
+
+    /**
+     * @test
+     */
+    public function replaceReferences()
+    {
+        $reference = Helper::getReference();
+        $referrer = Helper::getReferrer();
+        $resource = Helper::getResource();
+
+        $document = new Document('test', array(
+            'foo' => 'bar',
+            'baz' => array(
+                'qux' => $reference,
+            ),
+        ));
+        $document->replaceReference($referrer);
+
+        $this->assertEquals(array(
+            'foo' => 'bar',
+            'baz' => array(
+                'qux' => $resource,
+            ),
+        ), $document->getData());
     }
 }

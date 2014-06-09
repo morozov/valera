@@ -152,7 +152,7 @@ class Result extends BaseResult
      * @param string $url
      * @param string $method
      * @param array $headers
-     * @param array $data
+     * @param array $payload
      *
      * @return $this
      * @throws \LogicException
@@ -162,10 +162,10 @@ class Result extends BaseResult
         $url,
         $method = Resource::METHOD_GET,
         array $headers = array(),
-        $data = null
+        $payload = null
     ) {
         $this->resolve();
-        $resource = new Resource($url, null, $method, $headers, $data);
+        $resource = new Resource($url, null, $method, $headers, $payload);
         $hash = $resource->getHash();
 
         $this->sources[$hash] = array(
@@ -173,7 +173,7 @@ class Result extends BaseResult
             'url' => $url,
             'method' => $method,
             'headers' => $headers,
-            'data' => $data,
+            'payload' => $payload,
         );
 
         return $this;

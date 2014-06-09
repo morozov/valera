@@ -14,11 +14,11 @@ class Helper
     public static function getSerializedResource()
     {
         return array(
-            'url' => 'http://example.com/',
-            'referrer' => 'http://example.org/',
+            'url' => 'http://example.com/path',
+            'referrer' => 'http://example.com/',
             'method' => Resource::METHOD_POST,
             'headers' => array('content-type' => 'application/json'),
-            'data' => array('foo' => 'bar'),
+            'payload' => array('foo' => 'bar'),
         );
     }
 

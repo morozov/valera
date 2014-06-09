@@ -8,17 +8,33 @@ use Valera\Entity\Document;
 use Valera\Resource;
 use Valera\Source\BlobSource;
 use Valera\Source\DocumentSource;
+use Valera\Value\Reference;
 
 /**
  * Unit test helper for value objects
  */
 class Helper
 {
+    public static function getReference()
+    {
+        return new Reference(
+            '/path',
+            Resource::METHOD_POST,
+            array('content-type' => 'application/json'),
+            array('foo' => 'bar')
+        );
+    }
+
+    public static function getReferrer()
+    {
+        return 'http://example.com/';
+    }
+
     public static function getResource()
     {
         return new Resource(
+            'http://example.com/path',
             'http://example.com/',
-            'http://example.org/',
             Resource::METHOD_POST,
             array('content-type' => 'application/json'),
             array('foo' => 'bar')

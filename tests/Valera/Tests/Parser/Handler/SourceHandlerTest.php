@@ -12,6 +12,7 @@ use Valera\Tests\Value\Helper;
  * @uses \Valera\Content
  * @uses \Valera\Parser\Result
  * @uses \Valera\Resource
+ * @uses \Valera\Value\ResourceData
  * @uses \Valera\Source
  * @uses \Valera\Source\DocumentSource
  * @uses \Valera\Worker\Result
@@ -70,7 +71,7 @@ class SourceHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             'Content-Type' => 'application/octet-stream',
         ), $resource->getHeaders());
-        $this->assertEquals('request-body', $resource->getData());
+        $this->assertEquals('request-body', $resource->getPayload());
         $this->assertEquals($content->getResource()->getUrl(), $resource->getReferrer());
     }
 }

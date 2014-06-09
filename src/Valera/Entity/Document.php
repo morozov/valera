@@ -5,6 +5,7 @@ namespace Valera\Entity;
 use Assert\Assertion;
 use Valera\Blob;
 use Valera\Resource;
+use Valera\Value\Reference;
 
 /**
  * Document entity
@@ -118,6 +119,20 @@ class Document
         }, function (Resource &$value) use ($resource, $blob) {
             $value = $blob;
             $this->isDirty = true;
+        });
+    }
+
+    /**
+     * Replaces references with resources
+     *
+     * @param string $referrer Referrer
+     */
+    public function replaceReference($referrer)
+    {
+        $this->iterate(function ($value) use ($referrer) {
+            return $value instanceof Reference;
+        }, function (Reference &$value) use ($referrer) {
+            $value = $value->getResource($referrer);
         });
     }
 

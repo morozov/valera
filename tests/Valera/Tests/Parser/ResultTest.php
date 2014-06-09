@@ -10,6 +10,7 @@ use Valera\Tests\Value\Helper;
  * @covers \Valera\Parser\Result
  * @covers \Valera\Worker\Result
  * @uses \Valera\Resource
+ * @uses \Valera\Value\ResourceData
  * @uses \Valera\Worker\Result
  */
 class ResultTest extends \PHPUnit_Framework_TestCase
@@ -143,14 +144,14 @@ class ResultTest extends \PHPUnit_Framework_TestCase
             'url' => 'http://example.com/',
             'method' => Resource::METHOD_GET,
             'headers' => array('accept' => '*/*'),
-            'data' => array(),
+            'payload' => array(),
         ), $sources);
         $this->assertContains(array(
             'type' => 'test2',
             'url' => 'http://example.org/',
             'method' => Resource::METHOD_POST,
             'headers' => array('content-type' => 'application/json'),
-            'data' => array('foo' => 'bar'),
+            'payload' => array('foo' => 'bar'),
         ), $sources);
         $this->assertTrue($this->theResult->getStatus());
     }

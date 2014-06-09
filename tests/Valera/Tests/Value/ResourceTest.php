@@ -13,7 +13,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(null, $resource->getReferrer());
         $this->assertEquals(Resource::METHOD_GET, $resource->getMethod());
         $this->assertEquals(array(), $resource->getHeaders());
-        $this->assertNull($resource->getData());
+        $this->assertNull($resource->getPayload());
         $this->assertInternalType('string', $resource->getHash());
     }
 

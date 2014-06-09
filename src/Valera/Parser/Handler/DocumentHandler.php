@@ -60,26 +60,29 @@ class DocumentHandler implements ResultHandler
      */
     public function handle($content, $result)
     {
+        $referrer = $content->getResource()->getUrl();
+
         foreach ($result->getNewDocuments() as $id => $document) {
-            $this->createDocument((string) $id, $document);
+            $this->createDocument((string) $id, $document, $referrer);
         }
 
         foreach ($result->getUpdatedDocuments() as $id => $callback) {
-            $this->updateDocument((string) $id, $callback);
+            $this->updateDocument((string) $id, $callback, $referrer);
         }
     }
 
     /**
      * Creates new document in storage
      *
-     * @param string $id   Document ID
-     * @param array  $data Document data
+     * @param string $id       Document ID
+     * @param array  $data     Document data
+     * @param string $referrer Referrer for related resources
      */
-    protected function createDocument($id, array $data)
+    protected function createDocument($id, array $data, $referrer)
     {
         $document = new Document($id, $data);
         $this->documentStorage->create($document);
-        $this->postProcess($document);
+        $this->postProcess($document, $referrer);
     }
 
     /**
@@ -87,13 +90,14 @@ class DocumentHandler implements ResultHandler
      *
      * @param string   $id       Document ID
      * @param callable $callback Callback to apply
+     * @param string   $referrer Referrer for related resources
      */
-    protected function updateDocument($id, callable $callback)
+    protected function updateDocument($id, callable $callback, $referrer)
     {
         $document = $this->documentStorage->retrieve($id);
         if ($document) {
             $document->update($callback);
-            $this->postProcess($document);
+            $this->postProcess($document, $referrer);
         }
     }
 
@@ -101,23 +105,26 @@ class DocumentHandler implements ResultHandler
      * Post-processes document data
      *
      * @param Document $document
+     * @param string   $referrer Referrer for related resources
      */
-    protected function postProcess(Document $document)
+    protected function postProcess(Document $document, $referrer)
     {
+        $document->replaceReference($referrer);
         foreach ($this->postProcessors as $postProcessor) {
             $postProcessor->process($document);
         }
 
-        $this->enqueueResources($document->getResources());
+        $this->enqueueResources($document, $referrer);
     }
 
     /**
      * Enqueues embedded resources of the document for further processing
      *
-     * @param \Valera\Resource[] $resources
+     * @param \Valera\Entity\Document $document Document
      */
-    protected function enqueueResources(array $resources)
+    protected function enqueueResources(Document $document)
     {
+        $resources = $document->getResources();
         foreach ($resources as $resource) {
             $source = new BlobSource($resource);
             $this->sourceQueue->enqueue($source);

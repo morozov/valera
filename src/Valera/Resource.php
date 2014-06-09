@@ -3,29 +3,24 @@
 namespace Valera;
 
 use Assert\Assertion;
+use Valera\Value\ResourceData;
 
 /**
  * Class Resource
  * @package Valera
  */
-final class Resource
+final class Resource extends ResourceData
 {
-    const METHOD_GET = 'GET';
-    const METHOD_POST = 'POST';
-
     private $url;
     private $referrer;
-    private $method;
-    private $headers;
-    private $data;
     private $hash;
 
     /**
      * @param $url string URL of the resource
-     * @param string $referrer HTTP referer
+     * @param string $referrer HTTP referrer
      * @param string $method HTTP method to fetch resource
      * @param array $headers
-     * @param array $data
+     * @param array $payload
      *
      * @throws \Assert\AssertionFailedException
      */
@@ -34,7 +29,7 @@ final class Resource
         $referrer = null,
         $method = self::METHOD_GET,
         array $headers = array(),
-        $data = null
+        $payload = null
     ) {
         if ($referrer !== null) {
             Assertion::string($url);
@@ -45,17 +40,11 @@ final class Resource
         }
 
         Assertion::url($url);
-        Assertion::string($method);
-        $method = strtoupper($method);
-        Assertion::inArray($method, array(self::METHOD_GET, self::METHOD_POST));
-
-        Assertion::allString($headers);
 
         $this->url = $url;
         $this->referrer = $referrer;
-        $this->method = $method;
-        $this->headers = $headers;
-        $this->data = $data;
+
+        parent::__construct($method, $headers, $payload);
 
         $this->hash();
     }
@@ -105,9 +94,9 @@ final class Resource
      *
      * @return array
      */
-    public function getData()
+    public function getPayload()
     {
-        return $this->data;
+        return $this->payload;
     }
 
     /**
@@ -126,7 +115,7 @@ final class Resource
     private function hash()
     {
         $this->hash = md5(serialize(array(
-            $this->url, $this->method, $this->headers, $this->data,
+            $this->url, $this->getMethod(), $this->getHeaders(), $this->getPayload(),
         )));
     }
 }

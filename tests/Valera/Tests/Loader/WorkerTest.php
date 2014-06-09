@@ -8,6 +8,7 @@ use Valera\Tests\Value\Helper;
 /**
  * @covers \Valera\Loader\Worker
  * @uses \Valera\Resource
+ * @uses \Valera\Value\ResourceData
  * @uses \Valera\Source
  * @uses \Valera\Source\DocumentSource
  */

@@ -10,6 +10,7 @@ use Valera\Tests\Value\Helper as ValueHelper;
  * @uses Valera\Blob
  * @uses Valera\Entity\Document
  * @uses Valera\Resource
+ * @uses Valera\Value\ResourceData
  * @uses Valera\Serializer\BlobSerializer
  * @uses Valera\Serializer\ResourceSerializer
  */

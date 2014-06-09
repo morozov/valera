@@ -37,9 +37,9 @@ class ResourceSerializer implements SerializerInterface
             $params['headers'] = $headers;
         }
 
-        $data = $resource->getData();
-        if ($data !== null) {
-            $params['data'] = $data;
+        $payload = $resource->getPayload();
+        if ($payload !== null) {
+            $params['payload'] = $payload;
         }
 
         return $params;
@@ -75,12 +75,12 @@ class ResourceSerializer implements SerializerInterface
             $headers = array();
         }
 
-        if (isset($params['data'])) {
-            $data = $params['data'];
+        if (isset($params['payload'])) {
+            $payload = $params['payload'];
         } else {
-            $data = null;
+            $payload = null;
         }
 
-        return new Resource($url, $referrer, $method, $headers, $data);
+        return new Resource($url, $referrer, $method, $headers, $payload);
     }
 }

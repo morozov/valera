@@ -14,6 +14,7 @@ use Valera\Tests\Value\Helper;
  * @uses \Valera\Entity\Document
  * @uses \Valera\Parser\Result
  * @uses \Valera\Resource
+ * @uses \Valera\Value\ResourceData
  * @uses \Valera\Source
  * @uses \Valera\Source\DocumentSource
  * @uses \Valera\Worker\Result

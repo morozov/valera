@@ -7,6 +7,7 @@ use Valera\Tests\Value\Helper as ValueHelper;
 /**
  * @covers Valera\Serializer\ResourceSerializer
  * @uses Valera\Resource
+ * @uses Valera\Value\ResourceData
  */
 class ResourceSerializerTest extends AbstractTest
 {
