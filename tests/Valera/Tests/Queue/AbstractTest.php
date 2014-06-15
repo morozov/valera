@@ -76,18 +76,18 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
         self::$queue->enqueue(self::$s2);
 
         $s1 = self::$queue->dequeue();
-        $this->assertContains($s1, self::$queue->getInProgress(), '', false, false);
+        $this->assertCollectionContains($s1, self::$queue->getInProgress());
 
         self::$queue->resolveCompleted($s1);
-        $this->assertNotContains($s1, self::$queue->getInProgress(), '', false, false);
-        $this->assertNotContains($s1, self::$queue->getFailed(), '', false, false);
-        $this->assertContains($s1, self::$queue->getCompleted(), '', false, false);
+        $this->assertCollectionNotContains($s1, self::$queue->getInProgress());
+        $this->assertCollectionNotContains($s1, self::$queue->getFailed());
+        $this->assertCollectionContains($s1, self::$queue->getCompleted());
 
         $s2 = self::$queue->dequeue();
         self::$queue->resolveFailed($s2, 'Failure reason');
-        $this->assertNotContains($s2, self::$queue->getInProgress(), '', false, false);
-        $this->assertNotContains($s2, self::$queue->getCompleted(), '', false, false);
-        $this->assertContains($s2, self::$queue->getFailed(), '', false, false);
+        $this->assertCollectionNotContains($s2, self::$queue->getInProgress());
+        $this->assertCollectionNotContains($s2, self::$queue->getCompleted());
+        $this->assertCollectionContains($s2, self::$queue->getFailed());
     }
 
     /**
@@ -120,11 +120,77 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      * @depends enqueue
-     * @expectedException Valera\Queue\Exception\LogicException
+     * @expectedException \Valera\Queue\Exception\LogicException
      */
     public function resolveNotInProgress()
     {
         self::$queue->enqueue(self::$s1);
         self::$queue->resolveCompleted(self::$s1);
+    }
+
+    /**
+     * @test
+     * @depends enqueue
+     * @depends dequeue
+     */
+    public function enqueueInProgress()
+    {
+        self::$queue->enqueue(self::$s1);
+        self::$queue->dequeue();
+        self::$queue->enqueue(self::$s1);
+
+        // make sure item is not added twice
+        $this->assertCount(0, self::$queue);
+
+        // make sure item is still in progress
+        $this->assertCollectionContains(self::$s1, self::$queue->getInProgress());
+    }
+
+    /**
+     * @test
+     * @depends enqueue
+     * @depends dequeue
+     */
+    public function enqueueCompleted()
+    {
+        self::$queue->enqueue(self::$s1);
+        $s = self::$queue->dequeue();
+        self::$queue->resolveCompleted($s);
+        self::$queue->enqueue(self::$s1);
+
+        // make sure item is not added twice
+        $this->assertCount(0, self::$queue);
+
+        // make sure item is still completed
+        $this->assertCollectionContains(self::$s1, self::$queue->getCompleted());
+    }
+
+    /**
+     * @test
+     * @depends enqueue
+     * @depends dequeue
+     */
+    public function enqueueFailed()
+    {
+        self::$queue->enqueue(self::$s1);
+        $s = self::$queue->dequeue();
+        self::$queue->resolveFailed($s, 'Failure reason');
+        self::$queue->enqueue(self::$s1);
+
+        // make sure item is not added twice
+        $this->assertCount(0, self::$queue);
+
+        // make sure item is still failed
+        $this->assertCollectionContains(self::$s1, self::$queue->getFailed());
+    }
+
+    private function assertCollectionContains($needle, $haystack, $message = '')
+    {
+        $this->assertContains($needle, $haystack, $message, false, false);
+    }
+
+    private function assertCollectionNotContains($needle, $haystack, $message = '')
+    {
+        $this->assertNotContains($needle, $haystack, $message, false, false);
     }
 }
