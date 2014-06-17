@@ -46,7 +46,7 @@ class SourceHandlerTest extends \PHPUnit_Framework_TestCase
     public function handle()
     {
         $result = new Result();
-        $result->addSource(
+        $result->addReference(
             'test-type',
             'http://example.com/',
             Resource::METHOD_POST,

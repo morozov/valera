@@ -47,7 +47,7 @@ class SourceHandler implements ResultHandler
         $referrer = $content->getResource()->getUrl();
 
         /** @var \Valera\Parser\Result $result */
-        foreach ($result->getSources() as $source) {
+        foreach ($result->getReferences() as $source) {
             $this->enqueueSource(array_merge($source, array(
                 'referrer' => $referrer,
             )));

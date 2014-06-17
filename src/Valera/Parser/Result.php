@@ -32,11 +32,11 @@ class Result extends BaseResult
     protected $blobs = array();
 
     /**
-     * New content sources
+     * New content references
      *
      * @var array
      */
-    protected $sources = array();
+    protected $references = array();
 
     /**
      * Returns new documents
@@ -134,15 +134,15 @@ class Result extends BaseResult
     }
 
     /**
-     * Returns new content sources
+     * Returns new content references
      *
      * @return array
      */
-    public function getSources()
+    public function getReferences()
     {
         $this->ensureSuccess();
 
-        return $this->sources;
+        return $this->references;
     }
 
     /**
@@ -157,7 +157,7 @@ class Result extends BaseResult
      * @return $this
      * @throws \LogicException
      */
-    public function addSource(
+    public function addReference(
         $type,
         $url,
         $method = Resource::METHOD_GET,
@@ -165,10 +165,8 @@ class Result extends BaseResult
         $payload = null
     ) {
         $this->resolve();
-        $resource = new Resource($url, null, $method, $headers, $payload);
-        $hash = $resource->getHash();
 
-        $this->sources[$hash] = array(
+        $this->references[] = array(
             'type' => $type,
             'url' => $url,
             'method' => $method,

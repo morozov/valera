@@ -32,7 +32,7 @@ class ResultTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($this->theResult->getNewDocuments());
         $this->assertEmpty($this->theResult->getUpdatedDocuments());
         $this->assertEmpty($this->theResult->getBlobs());
-        $this->assertEmpty($this->theResult->getSources());
+        $this->assertEmpty($this->theResult->getReferences());
     }
 
     /**
@@ -122,22 +122,22 @@ class ResultTest extends \PHPUnit_Framework_TestCase
      * @test
      * @depends defaults
      */
-    public function addSource()
+    public function addReference()
     {
-        $this->theResult->addSource(
+        $this->theResult->addReference(
             'test1',
             'http://example.com/',
             Resource::METHOD_GET,
             array('accept' => '*/*')
         );
-        $this->theResult->addSource(
+        $this->theResult->addReference(
             'test2',
             'http://example.org/',
             Resource::METHOD_POST,
             array('content-type' => 'application/json'),
             array('foo' => 'bar')
         );
-        $sources = $this->theResult->getSources();
+        $references = $this->theResult->getReferences();
 
         $this->assertContains(array(
             'type' => 'test1',
@@ -145,14 +145,14 @@ class ResultTest extends \PHPUnit_Framework_TestCase
             'method' => Resource::METHOD_GET,
             'headers' => array('accept' => '*/*'),
             'payload' => array(),
-        ), $sources);
+        ), $references);
         $this->assertContains(array(
             'type' => 'test2',
             'url' => 'http://example.org/',
             'method' => Resource::METHOD_POST,
             'headers' => array('content-type' => 'application/json'),
             'payload' => array('foo' => 'bar'),
-        ), $sources);
+        ), $references);
         $this->assertTrue($this->theResult->getStatus());
     }
 }
