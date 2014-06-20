@@ -184,6 +184,56 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
         $this->assertCollectionContains(self::$s1, self::$queue->getFailed());
     }
 
+    /**
+     * @test
+     * @depends dequeue
+     */
+    public function reEnqueueFailed()
+    {
+        self::$queue->enqueue(self::$s1);
+        $s = self::$queue->dequeue();
+        self::$queue->resolveFailed($s, 'Failure reason');
+
+        self::$queue->reEnqueueFailed();
+
+        // make sure item is added back to queue
+        $s = self::$queue->dequeue();
+        $this->assertEquals(self::$s1, $s);
+
+        // make sure there are no items marked as failed
+        $this->assertCount(0, self::$queue->getFailed());
+    }
+
+    /**
+     * @test
+     * @depends dequeue
+     */
+    public function reEnqueueAll()
+    {
+        self::$queue->enqueue(self::$s1);
+        self::$queue->enqueue(self::$s2);
+
+        $s = self::$queue->dequeue();
+        self::$queue->resolveCompleted($s);
+
+        $s = self::$queue->dequeue();
+        self::$queue->resolveFailed($s, 'Failure reason');
+
+        self::$queue->reEnqueueAll();
+
+        // make sure items are added back to queue
+        $items = array();
+        $items[] = self::$queue->dequeue();
+        $items[] = self::$queue->dequeue();
+
+        $this->assertCollectionContains(self::$s1, $items);
+        $this->assertCollectionContains(self::$s2, $items);
+
+        // make sure there are no items marked as failed or completed
+        $this->assertCount(0, self::$queue->getFailed());
+        $this->assertCount(0, self::$queue->getCompleted());
+    }
+
     private function assertCollectionContains($needle, $haystack, $message = '')
     {
         $this->assertContains($needle, $haystack, $message, false, false);

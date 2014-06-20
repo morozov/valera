@@ -16,14 +16,14 @@ use Valera\Queue\Exception\LogicException;
 class InMemory implements Queue
 {
     /**
-     * Underlying queue
+     * Pending items
      *
      * @var \SplQueue
      */
-    protected $queue;
+    protected $pending;
 
     /**
-     * Underlying queue index
+     * Pending items index
      *
      * @var array
      */
@@ -55,7 +55,7 @@ class InMemory implements Queue
      */
     public function __construct()
     {
-        $this->queue = new SplQueue();
+        $this->pending = new SplQueue();
     }
 
     /** @inheritDoc */
@@ -71,18 +71,25 @@ class InMemory implements Queue
             return;
         }
 
+        $this->addToPending($item);
+    }
+
+    protected function addToPending(Queueable $item)
+    {
+        $hash = $item->getHash();
+
         $this->index[$hash] = true;
-        $this->queue->enqueue($item);
+        $this->pending->enqueue($item);
     }
 
     /** @inheritDoc */
     public function dequeue()
     {
-        if ($this->queue->isEmpty()) {
+        if ($this->pending->isEmpty()) {
             return null;
         }
 
-        $item = $this->queue->dequeue();
+        $item = $this->pending->dequeue();
         $hash = $item->getHash();
 
         $this->inProgress[$hash] = $item;
@@ -109,8 +116,8 @@ class InMemory implements Queue
     /** {@inheritDoc} */
     public function clean()
     {
-        while (!$this->queue->isEmpty()) {
-            $this->queue->dequeue();
+        while (!$this->pending->isEmpty()) {
+            $this->pending->dequeue();
         }
 
         $this->index = $this->inProgress = $this->completed = $this->failed
@@ -142,7 +149,33 @@ class InMemory implements Queue
      */
     public function count()
     {
-        return count($this->queue);
+        return count($this->pending);
+    }
+
+    /**
+     * Re-enqueues failed items
+     */
+    public function reEnqueueFailed()
+    {
+        foreach ($this->failed as $item) {
+            $this->addToPending($item);
+        }
+
+        $this->failed = array();
+    }
+
+    /**
+     * Re-enqueues failed and completed items
+     */
+    public function reEnqueueAll()
+    {
+        $this->reEnqueueFailed();
+
+        foreach ($this->completed as $item) {
+            $this->addToPending($item);
+        }
+
+        $this->completed = array();
     }
 
     /**

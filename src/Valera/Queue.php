@@ -65,4 +65,14 @@ interface Queue extends Countable
      * @return \Iterator
      */
     public function getFailed();
+
+    /**
+     * Re-enqueues failed items
+     */
+    public function reEnqueueFailed();
+
+    /**
+     * Re-enqueues failed and completed items
+     */
+    public function reEnqueueAll();
 }
