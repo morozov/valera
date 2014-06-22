@@ -81,6 +81,7 @@ class DocumentHandler implements ResultHandler
     protected function createDocument($id, array $data, $referrer)
     {
         $document = new Document($id, $data);
+        $document->replaceReference($referrer);
         $this->documentStorage->create($document);
         $this->postProcess($document, $referrer);
     }
@@ -97,6 +98,7 @@ class DocumentHandler implements ResultHandler
         $document = $this->documentStorage->retrieve($id);
         if ($document) {
             $document->update($callback);
+            $document->replaceReference($referrer);
             $this->postProcess($document, $referrer);
         }
     }
@@ -109,7 +111,6 @@ class DocumentHandler implements ResultHandler
      */
     protected function postProcess(Document $document, $referrer)
     {
-        $document->replaceReference($referrer);
         foreach ($this->postProcessors as $postProcessor) {
             $postProcessor->process($document);
         }
