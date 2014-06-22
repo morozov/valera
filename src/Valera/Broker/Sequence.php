@@ -51,7 +51,7 @@ class Sequence implements BrokerInterface
                 );
             } else {
                 $numIdles++;
-                $this->logger->debug(sprintf('%d of %d broker are idle', $numIdles, $totalCount));
+                $this->logger->debug(sprintf('%d of %d broker are idle', $numIdles, $numBrokers));
             }
 
             if ($numIdles >= $numBrokers) {
