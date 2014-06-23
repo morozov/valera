@@ -15,21 +15,38 @@ class InMemory implements BlobStorage
      */
     public function create(Resource $resource, $contents)
     {
-        $hash = $resource->getHash();
-        if (isset($this->blobs[$hash])) {
+        if ($this->isStored($resource)) {
             throw new DomainException('Blob already exists');
         }
 
-        $this->blobs[$hash] = $contents;
+        $path = $resource->getHash();
+        $this->blobs[$path] = $contents;
 
-        return $hash;
+        return $path;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isStored(Resource $resource)
+    {
+        $path = $resource->getHash();
+        return isset($this->blobs[$path]);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getPath(Resource $resource)
+    {
+        return $resource->getHash();
     }
 
     public function retrieve(Resource $resource)
     {
-        $hash = $resource->getHash();
-        if (isset($this->blobs[$hash])) {
-            return $this->blobs[$hash];
+        if ($this->isStored($resource)) {
+            $path = $this->getPath($resource);
+            return $this->blobs[$path];
         }
 
         return null;
@@ -37,8 +54,8 @@ class InMemory implements BlobStorage
 
     public function delete(Resource $resource)
     {
-        $hash = $resource->getHash();
-        unset($this->blobs[$hash]);
+        $path = $this->getPath($resource);
+        unset($this->blobs[$path]);
     }
 
     public function clean()

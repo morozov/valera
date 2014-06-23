@@ -16,6 +16,32 @@ interface BlobStorage extends Countable
      * @return string
      */
     public function create(Resource $resource, $contents);
+
+    /**
+     * Returns whether the specified resource is stored
+     *
+     * @param \Valera\Resource $resource
+     *
+     * @return boolean
+     */
+    public function isStored(Resource $resource);
+
+    /**
+     * Returns path corresponding to the given resource
+     *
+     * @param \Valera\Resource $resource
+     *
+     * @return string
+     */
+    public function getPath(Resource $resource);
+
+    /**
+     * Returns blob contents
+     *
+     * @param \Valera\Resource $resource
+     *
+     * @return string
+     */
     public function retrieve(Resource $resource);
     public function delete(Resource $resource);
     public function clean();
