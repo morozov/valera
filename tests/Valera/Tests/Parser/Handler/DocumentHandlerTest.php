@@ -27,6 +27,11 @@ class DocumentHandlerTest extends \PHPUnit_Framework_TestCase
     private $documentStorage;
 
     /**
+     * @var \Valera\Storage\BlobStorage|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $blobStorage;
+
+    /**
      * @var \Valera\Queue|\PHPUnit_Framework_MockObject_MockObject
      */
     private $sourceQueue;
@@ -55,9 +60,16 @@ class DocumentHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $logger = $this->getMock('Psr\\Log\\LoggerInterface');
         $this->documentStorage = $this->getMock('Valera\\Storage\\DocumentStorage');
+        $this->blobStorage = $this->getMock('Valera\\Storage\\BlobStorage');
         $this->sourceQueue = $this->getMock('Valera\\Queue');
         $this->postProcessor = $this->getMock('Valera\\Parser\\PostProcessor');
-        $this->handler = new Handler($this->documentStorage, $this->sourceQueue, array($this->postProcessor), $logger);
+        $this->handler = new Handler(
+            $this->documentStorage,
+            $this->blobStorage,
+            $this->sourceQueue,
+            array($this->postProcessor),
+            $logger
+        );
         $this->document = null;
         $this->source = null;
     }

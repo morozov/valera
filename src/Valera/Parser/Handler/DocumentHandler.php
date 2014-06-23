@@ -4,10 +4,12 @@ namespace Valera\Parser\Handler;
 
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use Valera\Blob;
 use Valera\Entity\Document;
 use Valera\Queue;
 use Valera\Source\BlobSource;
 use Valera\Storage\DocumentStorage;
+use Valera\Storage\BlobStorage;
 use Valera\Worker\ResultHandler;
 
 /**
@@ -23,6 +25,11 @@ class DocumentHandler implements ResultHandler
     protected $documentStorage;
 
     /**
+     * @var \Valera\Storage\BlobStorage
+     */
+    protected $blobStorage;
+
+    /**
      * @var \Valera\Queue
      */
     protected $sourceQueue;
@@ -36,17 +43,20 @@ class DocumentHandler implements ResultHandler
      * Constructor
      *
      * @param \Valera\Storage\DocumentStorage $documentStorage
+     * @param \Valera\Storage\DocumentStorage $blobStorage
      * @param \Valera\Queue                   $sourceQueue
      * @param \Valera\Parser\PostProcessor[]  $postProcessors
      * @param \Psr\Log\LoggerInterface        $logger
      */
     public function __construct(
         DocumentStorage $documentStorage,
+        BlobStorage $blobStorage,
         Queue $sourceQueue,
         array $postProcessors,
         LoggerInterface $logger
     ) {
         $this->documentStorage = $documentStorage;
+        $this->blobStorage = $blobStorage;
         $this->sourceQueue = $sourceQueue;
         $this->postProcessors = $postProcessors;
         $this->setLogger($logger);
@@ -81,9 +91,8 @@ class DocumentHandler implements ResultHandler
     protected function createDocument($id, array $data, $referrer)
     {
         $document = new Document($id, $data);
-        $document->replaceReference($referrer);
-        $this->documentStorage->create($document);
         $this->postProcess($document, $referrer);
+        $this->documentStorage->create($document);
     }
 
     /**
@@ -98,8 +107,8 @@ class DocumentHandler implements ResultHandler
         $document = $this->documentStorage->retrieve($id);
         if ($document) {
             $document->update($callback);
-            $document->replaceReference($referrer);
             $this->postProcess($document, $referrer);
+            $this->documentStorage->update($document);
         }
     }
 
@@ -115,7 +124,8 @@ class DocumentHandler implements ResultHandler
             $postProcessor->process($document);
         }
 
-        $this->enqueueResources($document, $referrer);
+        $document->replaceReference($referrer);
+        $this->processResources($document);
     }
 
     /**
@@ -123,12 +133,18 @@ class DocumentHandler implements ResultHandler
      *
      * @param \Valera\Entity\Document $document Document
      */
-    protected function enqueueResources(Document $document)
+    protected function processResources(Document $document)
     {
         $resources = $document->getResources();
         foreach ($resources as $resource) {
-            $source = new BlobSource($resource);
-            $this->sourceQueue->enqueue($source);
+            if ($this->blobStorage->isStored($resource)) {
+                $path = $this->blobStorage->getPath($resource);
+                $blob = new Blob($path, $resource);
+                $document->replaceResource($blob);
+            } else {
+                $source = new BlobSource($resource);
+                $this->sourceQueue->enqueue($source);
+            }
         }
     }
 }
