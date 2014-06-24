@@ -52,4 +52,13 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $resource = new Resource('http://example.org/', 'http://example.com/');
         $this->assertEquals('http://example.org/', $resource->getUrl());
     }
+
+    /** @test */
+    public function referrerDoesNotAffectHash()
+    {
+        $r1 = new Resource('http://example.org/');
+        $r2 = new Resource('http://example.org/', 'http://example.com/');
+
+        $this->assertEquals($r1->getHash(), $r2->getHash());
+    }
 }
