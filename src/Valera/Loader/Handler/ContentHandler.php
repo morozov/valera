@@ -122,6 +122,7 @@ class ContentHandler implements ResultHandler
             $blob = new Blob($path, $resource);
             foreach ($documents as $document) {
                 $document->replaceResource($blob);
+                $this->documentStorage->update($document);
             }
         }
     }
