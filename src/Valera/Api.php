@@ -7,6 +7,7 @@ use Valera\Broker\BrokerInterface;
 use Valera\Queue;
 use Valera\Storage\DocumentStorage;
 use Valera\Storage\BlobStorage;
+use Valera\Source\DocumentSource as Source;
 
 class Api
 {
@@ -36,6 +37,11 @@ class Api
     protected $broker;
 
     /**
+     * @var array
+     */
+    protected $sources;
+
+    /**
      * @var callable
      */
     protected $bootstrap;
@@ -46,13 +52,17 @@ class Api
         DocumentStorage $documentStorage,
         BlobStorage $blobStorage,
         BrokerInterface $broker,
+        array $sources,
         callable $bootstrap = null
     ) {
+        Assertion::allIsArray($sources);
+
         $this->sourceQueue = $sourceQueue;
         $this->contentQueue = $contentQueue;
         $this->blobStorage = $blobStorage;
         $this->documentStorage = $documentStorage;
         $this->broker = $broker;
+        $this->sources = $sources;
         $this->bootstrap = $bootstrap;
     }
 
@@ -86,6 +96,7 @@ class Api
             }
         }
 
+        $this->enqueueSources();
         return $this->broker->run();
     }
 
@@ -95,6 +106,16 @@ class Api
             $queue->reEnqueueAll();
         } else {
             $queue->reEnqueueFailed();
+        }
+    }
+
+    protected function enqueueSources()
+    {
+        foreach ($this->sources as $spec) {
+            list($type, $url) = $spec;
+            $resource = new Resource($url);
+            $source = new Source($type, $resource);
+            $this->sourceQueue->enqueue($source);
         }
     }
 }
