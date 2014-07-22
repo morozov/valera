@@ -32,7 +32,7 @@ class FacadeTest extends \PHPUnit_Framework_TestCase
         $factory = $this->getFactory($parser);
 
         $facade = new Facade($factory);
-        $facade->parse($content, $result);
+        $facade->parse($content, $result, $content->getResource());
     }
 
     public function testUnknownTypeResultsToFailure()
@@ -48,7 +48,7 @@ class FacadeTest extends \PHPUnit_Framework_TestCase
         $factory = $this->getFactory(null);
 
         $facade = new Facade($factory);
-        $facade->parse($content, $result);
+        $facade->parse($content, $result, $content->getResource());
     }
 
     private function getFactory(ParserInterface $parser = null)

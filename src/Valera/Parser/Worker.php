@@ -41,6 +41,6 @@ class Worker implements WorkerInterface
     public function process($content, $result)
     {
         $this->logger->info('Parsing something');
-        $this->parser->parse($content, $result);
+        $this->parser->parse($content, $result, $content->getResource());
     }
 }

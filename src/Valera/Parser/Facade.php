@@ -3,6 +3,7 @@
 namespace Valera\Parser;
 
 use Valera\Content;
+use Valera\Resource;
 
 class Facade implements ParserInterface
 {
@@ -19,12 +20,12 @@ class Facade implements ParserInterface
         $this->factory = $factory;
     }
 
-    public function parse(Content $content, Result $result)
+    public function parse(Content $content, Result $result, Resource $resource)
     {
         $type = $content->getType();
         $parser = $this->factory->getParser($type);
         if ($parser) {
-            return $parser->parse($content, $result);
+            return $parser->parse($content, $result, $resource);
         }
 
         $result->fail(sprintf(

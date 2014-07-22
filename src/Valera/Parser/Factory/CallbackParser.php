@@ -5,6 +5,7 @@ namespace Valera\Parser\Factory;
 use Valera\Content;
 use Valera\Parser\ParserInterface;
 use Valera\Parser\Result;
+use Valera\Resource;
 
 /**
  * Parser that uses callback function as its implementation. Used in order
@@ -32,9 +33,9 @@ class CallbackParser implements ParserInterface
     /**
      * {@inheritDoc}
      */
-    public function parse(Content $content, Result $result)
+    public function parse(Content $content, Result $result, Resource $resource)
     {
         $callback = $this->callback;
-        return $callback($content, $result);
+        return $callback($content, $result, $resource);
     }
 }

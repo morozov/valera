@@ -22,10 +22,11 @@ class CallbackParserTest extends \PHPUnit_Framework_TestCase
             ->setMethods(array('__invoke'))
             ->getMock();
         $content = Helper::getContent();
+        $resource = $content->getResource();
         $result = new Result();
         $callback->expects($this->once())->method('__invoke')
-            ->with($content, $result);
+            ->with($content, $result, $resource);
         $parser = new CallbackParser($callback);
-        $parser->parse($content, $result);
+        $parser->parse($content, $result, $resource);
     }
 }
