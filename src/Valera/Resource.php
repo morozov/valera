@@ -33,13 +33,13 @@ final class Resource extends ResourceData
     ) {
         if ($referrer !== null) {
             Assertion::string($url);
-            Assertion::url($referrer);
+            $this->assertUrl($referrer);
 
             // make URL absolute based on referrer and relative URL
             $url = \phpUri::parse($referrer)->join($url);
         }
 
-        Assertion::url($url);
+        $this->assertUrl($url);
 
         $this->url = $url;
         $this->referrer = $referrer;
@@ -117,5 +117,15 @@ final class Resource extends ResourceData
         $this->hash = md5(serialize(array(
             $this->url, $this->getMethod(), $this->getHeaders(), $this->getPayload(),
         )));
+    }
+
+    /**
+     * Asserts that the passed string is URL
+     *
+     * @param string $url
+     */
+    private function assertUrl($url)
+    {
+        Assertion::regex($url, '/https?:\/\/.+/', 'Resource URL seems invalid');
     }
 }
