@@ -40,7 +40,7 @@ class Worker implements WorkerInterface
      */
     public function process($content, $result)
     {
-        $this->logger->info('Parsing something');
+        $this->logger->info('Parsing item #' . $content->getHash());
         $this->parser->parse($content, $result, $content->getResource());
     }
 }
