@@ -90,7 +90,7 @@ class BrokerTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function logicException()
+    public function workerException()
     {
         $item = $this->getItem();
         $this->enqueueItem($item);
@@ -105,6 +105,26 @@ class BrokerTest extends \PHPUnit_Framework_TestCase
 
         $this->processItem($item, function () {
             throw new \LogicException;
+        });
+    }
+
+    /** @test */
+    public function handlerException()
+    {
+        $item = $this->getItem();
+        $this->enqueueItem($item);
+        $this->setQueueCount(1);
+
+        $this->handler->expects($this->once())
+            ->method('handle')
+            ->will($this->throwException(new \LogicException));
+
+        $this->queue->expects($this->once())
+            ->method('resolveFailed')
+            ->with($item, $this->stringStartsWith('Exception'));
+
+        $this->processItem($item, function (Result $result) {
+            $result->resolve();
         });
     }
 

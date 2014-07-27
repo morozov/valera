@@ -189,4 +189,15 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
             $this->document->getId() => $this->document,
         ), $array);
     }
+
+    /**
+     * @test
+     * @depends create
+     * @expectedException \DomainException
+     */
+    public function duplicate()
+    {
+        self::$storage->create($this->document);
+        self::$storage->create($this->document);
+    }
 }
