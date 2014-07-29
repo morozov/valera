@@ -12,7 +12,8 @@ interface BrokerInterface extends LoggerAwareInterface
     /**
      * Run broker
      *
+     * @param int $maxItems
      * @return int The number of processed items
      */
-    public function run();
+    public function run($maxItems = null);
 }

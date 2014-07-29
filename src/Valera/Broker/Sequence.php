@@ -32,17 +32,23 @@ class Sequence implements BrokerInterface
         $this->logger = $logger;
     }
 
-    /** {@inheritDoc} */
-    public function run()
+    /**
+     * {@inheritDoc}
+     */
+    public function run($maxItems = null)
     {
+        \Assert\that($maxItems)->nullOr()->integer()->min(1);
+
         $totalCount = 0;
         $numBrokers = count($this->brokers);
         $numIdles = 0;
+
+        /** @var \Valera\Broker\BrokerInterface[] $brokers */
         $brokers = new \InfiniteIterator(new \ArrayIterator($this->brokers));
 
         foreach ($brokers as $name => $broker) {
             $this->logger->debug(sprintf('Running broker "%s"', $name));
-            $count = $broker->run();
+            $count = $broker->run(1);
             if ($count) {
                 $totalCount += $count;
                 $numIdles = 0;
@@ -55,6 +61,10 @@ class Sequence implements BrokerInterface
             }
 
             if ($numIdles >= $numBrokers) {
+                break;
+            }
+
+            if ($maxItems > 0 && $totalCount >= $maxItems) {
                 break;
             }
         }

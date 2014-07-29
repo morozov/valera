@@ -23,6 +23,8 @@ class Cli
         $getOpt->addOptions(array(
             array(null, 'restart', Getopt::OPTIONAL_ARGUMENT),
             array('f', 'force', Getopt::NO_ARGUMENT),
+            array(null, 'max-items', Getopt::OPTIONAL_ARGUMENT),
+            array(null, 'max-items-code', Getopt::OPTIONAL_ARGUMENT),
         ));
         $this->getOpt = $getOpt;
     }
@@ -32,6 +34,14 @@ class Cli
         $this->getOpt->parse($arguments);
         $restart = $this->getOpt->getOption('restart');
         $force = (boolean) $this->getOpt->getOption('force');
+        $maxItems = $this->getOpt->getOption('max-items');
+        if ($maxItems !== null) {
+            // validate $maxItems
+            $maxItemsCode = $this->getOpt->getOption('max-items-code');
+            // validate $maxItemsCode
+        } else {
+            $maxItemsCode = 0;
+        }
 
         if ($restart === 1) {
             $restart = 'loader';
@@ -47,6 +57,11 @@ class Cli
                 break;
         }
 
-        $this->api->run();
+        $total = $this->api->run($maxItems);
+        if ($total >= $maxItems) {
+            return 0;
+        } else {
+            return $maxItemsCode;
+        }
     }
 }

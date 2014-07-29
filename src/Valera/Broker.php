@@ -75,8 +75,13 @@ class Broker implements BrokerInterface
         });
     }
 
-    public function run()
+    /**
+     * {@inheritDoc}
+     */
+    public function run($maxItems = null)
     {
+        \Assert\that($maxItems)->nullOr()->integer()->min(1);
+
         $this->logger->info('Running worker');
 
         if (!count($this->queue)) {
