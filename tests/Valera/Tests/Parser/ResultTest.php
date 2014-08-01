@@ -72,14 +72,14 @@ class ResultTest extends \PHPUnit_Framework_TestCase
         };
         $callback2 = function () {
         };
-        
+
         $this->theResult->updateDocument('test1', $callback1);
         $this->theResult->updateDocument('test2', $callback2);
         $updatedDocuments = $this->theResult->getUpdatedDocuments();
 
         $this->assertEquals(array(
             'test1' => $callback1,
-            'test2' => $callback1,
+            'test2' => $callback2,
         ), $updatedDocuments);
         $this->assertTrue($this->theResult->getStatus());
     }
