@@ -6,7 +6,7 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Valera\Blob;
 use Valera\Content;
-use Valera\Queue;
+use Valera\Queue\Writable;
 use Valera\Resource;
 use Valera\Source\BlobSource;
 use Valera\Source\DocumentSource;
@@ -24,9 +24,9 @@ class ContentHandler implements ResultHandler
     /**
      * Content queue
      *
-     * @var \Valera\Queue
+     * @var \Valera\Queue\Writable
      */
-    protected $contentQueue;
+    protected $contents;
 
     /**
      * @var \Valera\Storage\BlobStorage
@@ -41,18 +41,18 @@ class ContentHandler implements ResultHandler
     /**
      * Constructor
      *
-     * @param \Valera\Queue                   $contentQueue
+     * @param \Valera\Queue\Writable              $contents
      * @param \Valera\Storage\BlobStorage     $blobStorage
      * @param \Valera\Storage\DocumentStorage $documentStorage
      * @param \Psr\Log\LoggerInterface        $logger
      */
     public function __construct(
-        Queue $contentQueue,
+        Writable $contents,
         BlobStorage $blobStorage,
         DocumentStorage $documentStorage,
         LoggerInterface $logger
     ) {
-        $this->contentQueue = $contentQueue;
+        $this->contents = $contents;
         $this->blobStorage = $blobStorage;
         $this->documentStorage = $documentStorage;
         $this->setLogger($logger);
@@ -85,15 +85,15 @@ class ContentHandler implements ResultHandler
      * Handles successful result
      *
      * @param \Valera\Source\DocumentSource $source Source being downloaded
-     * @param string                        $contents
+     * @param string                        $content
      * @param string                        $mimeType
      */
-    protected function handleDocumentContents(DocumentSource $source, $contents, $mimeType)
+    protected function handleDocumentContents(DocumentSource $source, $content, $mimeType)
     {
         /** @var \Valera\Source $source */
-        $contents = new Content($contents, $mimeType, $source);
+        $content = new Content($content, $mimeType, $source);
 
-        $this->contentQueue->enqueue($contents);
+        $this->contents->enqueue($content);
     }
 
     /**

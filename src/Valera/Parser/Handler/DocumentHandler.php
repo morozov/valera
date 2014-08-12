@@ -6,7 +6,7 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Valera\Blob;
 use Valera\Entity\Document;
-use Valera\Queue;
+use Valera\Queue\Writable;
 use Valera\Source\BlobSource;
 use Valera\Storage\DocumentStorage;
 use Valera\Storage\BlobStorage;
@@ -30,9 +30,9 @@ class DocumentHandler implements ResultHandler
     protected $blobStorage;
 
     /**
-     * @var \Valera\Queue
+     * @var \Valera\Queue\Writable
      */
-    protected $sourceQueue;
+    protected $sources;
 
     /**
      * @var \Valera\Parser\PostProcessor[]
@@ -43,21 +43,21 @@ class DocumentHandler implements ResultHandler
      * Constructor
      *
      * @param \Valera\Storage\DocumentStorage $documentStorage
-     * @param \Valera\Storage\DocumentStorage $blobStorage
-     * @param \Valera\Queue                   $sourceQueue
+     * @param \Valera\Storage\BlobStorage     $blobStorage
+     * @param \Valera\Queue\Writable              $sources
      * @param \Valera\Parser\PostProcessor[]  $postProcessors
      * @param \Psr\Log\LoggerInterface        $logger
      */
     public function __construct(
         DocumentStorage $documentStorage,
         BlobStorage $blobStorage,
-        Queue $sourceQueue,
+        Writable $sources,
         array $postProcessors,
         LoggerInterface $logger
     ) {
         $this->documentStorage = $documentStorage;
         $this->blobStorage = $blobStorage;
-        $this->sourceQueue = $sourceQueue;
+        $this->sources = $sources;
         $this->postProcessors = $postProcessors;
         $this->setLogger($logger);
     }
@@ -143,7 +143,7 @@ class DocumentHandler implements ResultHandler
                 $document->replaceResource($blob);
             } else {
                 $source = new BlobSource($resource);
-                $this->sourceQueue->enqueue($source);
+                $this->sources->enqueue($source);
             }
         }
     }

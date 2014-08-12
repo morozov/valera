@@ -4,7 +4,7 @@ namespace Valera\Parser\Handler;
 
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
-use Valera\Queue;
+use Valera\Queue\Writable;
 use Valera\Resource;
 use Valera\Source\DocumentSource;
 use Valera\Worker\ResultHandler;
@@ -17,21 +17,21 @@ class SourceHandler implements ResultHandler
     use LoggerAwareTrait;
 
     /**
-     * @var \Valera\Queue
+     * @var \Valera\Queue\Writable
      */
-    protected $sourceQueue;
+    protected $sources;
 
     /**
      * Constructor
      *
-     * @param \Valera\Queue            $sourceQueue
+     * @param \Valera\Queue\Writable       $sources
      * @param \Psr\Log\LoggerInterface $logger
      */
     public function __construct(
-        Queue $sourceQueue,
+        Writable $sources,
         LoggerInterface $logger
     ) {
-        $this->sourceQueue = $sourceQueue;
+        $this->sources = $sources;
         $this->setLogger($logger);
     }
 
@@ -70,6 +70,6 @@ class SourceHandler implements ResultHandler
         );
 
         $source = new DocumentSource($params['type'], $resource);
-        $this->sourceQueue->enqueue($source);
+        $this->sources->enqueue($source);
     }
 }

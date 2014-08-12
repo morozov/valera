@@ -2,22 +2,15 @@
 
 namespace Valera;
 
-use Countable;
+use Valera\Queue\Writable;
 
 /**
  * Interface Queue
  *
  * @package Valera
  */
-interface Queue extends Countable
+interface Queue extends Writable, \Countable
 {
-    /**
-     * Enqueues item
-     *
-     * @param \Valera\Queueable $item 
-     */
-    public function enqueue(Queueable $item);
-
     /**
      * Dequeues item
      *
