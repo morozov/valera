@@ -37,8 +37,10 @@ class BrokerTest extends \PHPUnit_Framework_TestCase
         $this->queue = $this->getMock('Valera\\Queue');
         $this->worker = $this->getMock('Valera\\Worker\\WorkerInterface');
         $this->handler = $this->getMock('Valera\\Worker\\ResultHandler');
+
+        /** @var \Psr\Log\LoggerInterface|\PHPUnit_Framework_MockObject_MockObject $logger */
         $logger = $this->getMock('Psr\\Log\\LoggerInterface');
-        $this->broker = new Broker($this->queue, $this->worker, new Result(), array($this->handler), $logger);
+        $this->broker = new Broker($this->worker, array($this->handler), new Result(), $logger);
     }
 
     /** @test */

@@ -33,7 +33,7 @@ class Sequence implements BrokerInterface
     }
 
     /** {@inheritDoc} */
-    public function run()
+    public function run(\Iterator $items)
     {
         $totalCount = 0;
         $numBrokers = count($this->brokers);

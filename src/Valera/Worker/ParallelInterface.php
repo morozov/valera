@@ -7,13 +7,13 @@ use Psr\Log\LoggerAwareInterface;
 /**
  * Worker that processes multiple items at a time
  */
-interface Multi extends LoggerAwareInterface
+interface ParallelInterface extends LoggerAwareInterface
 {
     /**
      * Processes multiple items from queue and calls corresponding callback
      *
      * @param \Iterator $items
-     * @param \Closure|null $callback
+     * @param \Closure  $wrapper
      */
-    public function processMulti(\Iterator $items, \Closure $callback);
+    public function processMulti(\Iterator $items, \Closure $wrapper);
 }

@@ -2,14 +2,12 @@
 
 namespace Valera;
 
-use Countable;
-
 /**
  * Interface Queue
  *
  * @package Valera
  */
-interface Queue extends Countable
+interface Queue extends \Countable
 {
     /**
      * Enqueues item
