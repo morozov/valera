@@ -57,7 +57,7 @@ class Resolver implements Observer
     public function wrapCallback($callback)
     {
         return function ($value) use ($callback) {
-            list($item, $result) = $this->getItemAndResult($value);
+            $this->getItemAndResult($value, $item, $result);
             $callback($value, $item, $result);
             $this->detach($value);
         };
@@ -110,23 +110,24 @@ class Resolver implements Observer
      * Returns result corresponding to the given item
      *
      * @param object $value
+     * @param \Valera\Queueable $item
+     * @param \Valera\Worker\Result $result
      *
-     * @return array
      * @throws \Exception
      */
-    public function getItemAndResult($value)
+    public function getItemAndResult($value, Queueable &$item = null, Result &$result = null)
     {
         if (!$this->storage->offsetExists($value)) {
             throw new \Exception();
         }
 
-        return $this->storage->offsetGet($value);
+        list($item, $result) = $this->storage->offsetGet($value);
     }
 
     protected function handleUnexpectedExit()
     {
         foreach ($this->storage as $value) {
-            list($item, $result) = $this->storage->getInfo();
+            $this->getItemAndResult($value, $item, $result);
             $result->fail('Script unexpectedly terminated');
             $this->resolve($value, $item, $result);
         }

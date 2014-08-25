@@ -3,9 +3,8 @@
 namespace Valera\Broker;
 
 use Psr\Log\LoggerInterface;
+use Valera\Queue;
 use Valera\Queue\Resolver;
-use Valera\Queueable;
-use Valera\Worker\Result;
 use Valera\Worker\ParallelInterface;
 
 /**
@@ -21,29 +20,33 @@ class Parallel extends Base
     /**
      * Constructor
      *
+     * @param \Valera\Queue                    $queue          Source queue
+     * @param callable|null                    $converter      Queued item converter
      * @param \Valera\Worker\ParallelInterface $worker         Worker instance
      * @param \Valera\Worker\ResultHandler[]   $resultHandlers Result prototype
      * @param \Valera\Queue\Resolver           $resolver
      * @param \Psr\Log\LoggerInterface         $logger         Logger
      */
     public function __construct(
+        Queue $queue,
+        callable $converter = null,
         ParallelInterface $worker,
         array $resultHandlers,
         Resolver $resolver,
         LoggerInterface $logger
     ) {
-        parent::__construct($resultHandlers, $resolver, $logger);
+        parent::__construct($queue, $converter, $resultHandlers, $resolver, $logger);
         $this->worker = $worker;
     }
 
     /** {@inheritDoc} */
-    public function run(\Iterator $values)
+    public function runIterator(\Iterator $values)
     {
         $this->worker->processMulti($values, function (\Closure $callback) {
             return function ($value) use ($callback) {
-                list($item, $result) = $this->resolver->getItemAndResult($value);
+                $this->resolver->getItemAndResult($value, $item, $result);
                 $callback($value, $item, $result);
-                $this->handle($item, $result);
+                $this->handle($value, $item, $result);
             };
         });
     }

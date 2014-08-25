@@ -12,8 +12,8 @@ interface WorkerInterface extends LoggerAwareInterface
     /**
      * Processes single item from queue and resolves result accordingly
      *
-     * @param \Valera\Queueable     $item
+     * @param mixed                 $value
      * @param \Valera\Worker\Result $result
      */
-    public function process($item, $result);
+    public function process($value, $result);
 }

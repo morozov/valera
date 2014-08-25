@@ -20,39 +20,43 @@ class Broker extends Base
     /**
      * Constructor
      *
+     * @param \Valera\Queue                  $queue          Source queue
+     * @param callable|null                  $converter      Queued item converter
      * @param \Valera\Worker\WorkerInterface $worker         Worker instance
      * @param \Valera\Worker\ResultHandler[] $resultHandlers Result prototype
      * @param \Valera\Queue\Resolver         $resolver
      * @param \Psr\Log\LoggerInterface       $logger         Logger
      */
     public function __construct(
+        Queue $queue,
+        callable $converter = null,
         WorkerInterface $worker,
         array $resultHandlers,
         Resolver $resolver,
         LoggerInterface $logger
     ) {
-        parent::__construct($resultHandlers, $resolver, $logger);
+        parent::__construct($queue, $converter, $resultHandlers, $resolver, $logger);
         $this->worker = $worker;
     }
 
     /** {@inheritDoc} */
-    public function run(\Iterator $values)
+    public function runIterator(\Iterator $values)
     {
-        foreach ($values as $object) {
-            $this->process($object);
+        foreach ($values as $value) {
+            $this->process($value);
         }
     }
 
-    protected function process($object)
+    protected function process($value)
     {
-        list($item, $result) = $this->resolver->getItemAndResult($object);
+        $this->resolver->getItemAndResult($value, $item, $result);
         try {
-            $this->worker->process($item, $result);
+            $this->worker->process($value, $result);
         } catch (\Exception $e) {
             $this->logger->error($e);
             $result->fail('Exception:' . $e->getMessage());
         }
 
-        $this->handle($item, $result);
+        $this->handle($value, $item, $result);
     }
 }

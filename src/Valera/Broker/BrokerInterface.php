@@ -12,9 +12,9 @@ interface BrokerInterface extends LoggerAwareInterface
     /**
      * Run broker
      *
-     * @param \Iterator $items
+     * @param int|null $limit
      *
      * @return int The number of processed items
      */
-    public function run(\Iterator $items);
+    public function run($limit = null);
 }
