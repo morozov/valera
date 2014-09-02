@@ -2,66 +2,89 @@
 
 namespace Valera;
 
-use Psr\Log\LoggerInterface;
-use Valera\Broker\Base;
+use Valera\Broker\BrokerInterface;
+use Valera\Queue\Iterator;
 use Valera\Queue\Resolver;
+use Valera\Worker\Converter;
 use Valera\Worker\WorkerInterface;
 
 /**
  * Default broker implementation
  */
-class Broker extends Base
+class Broker implements BrokerInterface
 {
     /**
-     * @var \Valera\Worker\WorkerInterface
+     * @var \Valera\Worker\ResultHandler[]
      */
-    protected $worker;
+    protected $resultHandlers;
+
+    /**
+     * Queue
+     *
+     * @var \Valera\Queue
+     */
+    protected $queue;
+
+    /**
+     * Queue resolver
+     *
+     * @var \Valera\Queue\Resolver
+     */
+    protected $resolver;
 
     /**
      * Constructor
      *
      * @param \Valera\Queue                  $queue          Source queue
-     * @param callable|null                  $converter      Queued item converter
      * @param \Valera\Worker\WorkerInterface $worker         Worker instance
-     * @param \Valera\Worker\ResultHandler[] $resultHandlers Result prototype
-     * @param \Valera\Queue\Resolver         $resolver
-     * @param \Psr\Log\LoggerInterface       $logger         Logger
+     * @param \Valera\Queue\Resolver         $resolver       Job queue resolver
      */
     public function __construct(
         Queue $queue,
-        callable $converter = null,
         WorkerInterface $worker,
-        array $resultHandlers,
-        Resolver $resolver,
-        LoggerInterface $logger
+        Resolver $resolver
     ) {
-        parent::__construct($queue, $converter, $resultHandlers, $resolver, $logger);
+        $this->queue = $queue;
         $this->worker = $worker;
+        $this->resolver = $resolver;
     }
 
-    /** {@inheritDoc} */
-    protected function runIterator(\Iterator $values)
+    /**
+     * Run broker
+     *
+     * @param int|null $limit
+     *
+     * @return int The number of processed items
+     */
+    public function run($limit = null)
     {
-        $count = 0;
-        foreach ($values as $value) {
-            $this->process($value);
-            $count++;
-        }
-
-        return $count;
+        $iterator = $this->getIterator($limit);
+        return $this->worker->process($iterator, function ($task, callable $callback) {
+            $this->resolver->resolve($task, $callback);
+        });
     }
 
-    protected function process($value)
+    /**
+     * Returns queue iterator
+     *
+     * @param int|null $limit
+     *
+     * @return \Iterator
+     */
+    protected function getIterator($limit = null)
     {
-        $item = $this->resolver->getItemByValue($value);
-        $result = $this->resolver->getResult();
-        try {
-            $this->worker->process($value, $result);
-        } catch (\Exception $e) {
-            $this->logger->error($e);
-            $result->fail('Exception:' . $e->getMessage());
+        if ($this->worker instanceof Converter) {
+            $iterator = new Iterator($this->queue, $this->worker);
+        } else {
+            $iterator = new Iterator($this->queue);
         }
 
-        $this->handle($value, $item, $result);
+        $iterator->attach($this->resolver);
+
+        if ($limit) {
+            $iterator = new \LimitIterator($iterator, 0, $limit);
+        }
+
+        return $iterator;
     }
 }

@@ -4,6 +4,7 @@ namespace Valera\Queue;
 
 use Valera\Queue;
 use Valera\Queueable;
+use Valera\Worker\Converter;
 
 /**
  * Queue iterator
@@ -39,18 +40,12 @@ class Iterator implements \Iterator
      * Constructor
      *
      * @param \Valera\Queue $queue
-     * @param \Closure|null $converter
+     * @param Converter|null $converter
      */
-    public function __construct(Queue $queue, \Closure $converter = null)
+    public function __construct(Queue $queue, Converter $converter = null)
     {
         $this->queue = $queue;
-        if ($converter) {
-            $this->converter = $converter;
-        } else {
-            $this->converter = function (Queueable $item) {
-                return $item;
-            };
-        }
+        $this->converter = $converter;
         $this->observers = new \SplObjectStorage();
     }
 
@@ -141,8 +136,9 @@ class Iterator implements \Iterator
      */
     protected function convert(Queueable $item)
     {
-        $converter = $this->converter;
-        $item = $converter($item);
+        if ($this->converter) {
+            return $this->converter->convert($item);
+        }
 
         return $item;
     }

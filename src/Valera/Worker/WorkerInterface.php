@@ -2,18 +2,16 @@
 
 namespace Valera\Worker;
 
-use Psr\Log\LoggerAwareInterface;
-
 /**
  * Internal implementation of the worker
  */
 interface WorkerInterface
 {
     /**
-     * Processes single item from queue and resolves result accordingly
+     * @param \Traversable $tasks
+     * @param callable     $resolver
      *
-     * @param mixed                 $value
-     * @param \Valera\Worker\Result $result
+     * @return int Number of processed tasks
      */
-    public function process($value, $result);
+    public function process(\Traversable $tasks, callable $resolver);
 }

@@ -2,12 +2,10 @@
 
 namespace Valera\Broker;
 
-use Psr\Log\LoggerAwareInterface;
-
 /**
  * Broker interface
  */
-interface BrokerInterface extends LoggerAwareInterface
+interface BrokerInterface
 {
     /**
      * Run broker

@@ -6,7 +6,6 @@ use Valera\Parser\Factory;
 
 /**
  * @covers \Valera\Parser\Factory
- * @uses \Valera\Parser\Factory\CallbackParser
  */
 class FactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -52,41 +51,5 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory->getParser('parser');
         $factory->getParser('parser');
-    }
-
-    /** @test */
-    public function registerParser()
-    {
-        $adapter1 = $this->getMockBuilder('Valera\\Parser\\AdapterInterface')
-            ->setMethods(array('supports', 'wrap'))
-            ->getMock();
-        $adapter1->expects($this->any())
-            ->method('supports')
-            ->willReturn(false);
-        $adapter1->expects($this->never())
-            ->method('wrap');
-
-        $adapter2 = $this->getMockBuilder('Valera\\Parser\\AdapterInterface')
-            ->setMethods(array('supports', 'wrap'))
-            ->getMock();
-        $adapter2->expects($this->any())
-            ->method('supports')
-            ->willReturn(true);
-        $adapter2->expects($this->once())
-            ->method('wrap')
-            ->willReturn(function () {
-            });
-
-        $this->factory->registerAdapter($adapter1);
-        $this->factory->registerAdapter($adapter2);
-
-        // adapter found
-        $parser1 = $this->factory->registerParser('test', null);
-        $this->assertInstanceOf('Valera\\Parser\\Factory\\CallbackParser', $parser1);
-
-        // adapter not found
-        $this->factory->unregisterAdapter($adapter2);
-        $this->setExpectedException('\InvalidArgumentException');
-        $this->factory->registerParser('test', null);
     }
 }
