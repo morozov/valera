@@ -20,7 +20,7 @@ class Facade implements ParserInterface
         $this->factory = $factory;
     }
 
-    public function parse(Content $content, Result $result, Resource $resource)
+    public function process(Content $content, Result $result, Resource $resource)
     {
         $type = $content->getType();
         $parser = $this->factory->getParser($type);

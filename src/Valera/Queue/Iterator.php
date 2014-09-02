@@ -8,7 +8,7 @@ use Valera\Queueable;
 /**
  * Queue iterator
  */
-class Iterator implements \Iterator, \SplSubject
+class Iterator implements \Iterator
 {
     /**
      * @var \Valera\Queue
@@ -21,7 +21,7 @@ class Iterator implements \Iterator, \SplSubject
     private $converter;
 
     /**
-     * @var \SplObserver[]
+     * @var \Valera\Queue\Resolver[]
      */
     private $observers;
 
@@ -64,9 +64,9 @@ class Iterator implements \Iterator, \SplSubject
         if (!$this->current) {
             $item = $this->queue->dequeue();
             if ($item) {
-                $item = $this->convert($item);
-                $this->current = $item;
-                $this->notify();
+                $value = $this->convert($item);
+                $this->current = $value;
+                $this->notify($value, $item);
             }
         }
 
@@ -116,20 +116,20 @@ class Iterator implements \Iterator, \SplSubject
         }
     }
 
-    public function attach(\SplObserver $observer)
+    public function attach(Resolver $observer)
     {
         $this->observers->attach($observer);
     }
 
-    public function detach(\SplObserver $observer)
+    public function detach(Resolver $observer)
     {
         $this->observers->detach($observer);
     }
 
-    public function notify()
+    public function notify($value, $item)
     {
         foreach ($this->observers as $observer) {
-            $observer->update($this);
+            $observer->update($value, $item);
         }
     }
 

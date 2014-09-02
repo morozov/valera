@@ -44,7 +44,8 @@ class Parallel extends Base
     {
         $this->worker->processMulti($values, function (\Closure $callback) {
             return function ($value) use ($callback) {
-                $this->resolver->getItemAndResult($value, $item, $result);
+                $item = $this->resolver->getItemByValue($value);
+                $result = $this->resolver->getResult();
                 $callback($value, $item, $result);
                 $this->handle($value, $item, $result);
             };

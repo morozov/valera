@@ -7,7 +7,7 @@ use Psr\Log\LoggerAwareInterface;
 /**
  * Internal implementation of the worker
  */
-interface WorkerInterface extends LoggerAwareInterface
+interface WorkerInterface
 {
     /**
      * Processes single item from queue and resolves result accordingly

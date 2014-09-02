@@ -9,7 +9,7 @@ use Valera\Worker\Result;
 /**
  * Queue item resolver
  */
-class Resolver implements Observer
+class Resolver
 {
     /**
      * @var \Valera\Queue
@@ -57,7 +57,8 @@ class Resolver implements Observer
     public function wrapCallback($callback)
     {
         return function ($value) use ($callback) {
-            $this->getItemAndResult($value, $item, $result);
+            $item = $this->getItemByValue($value);
+            $result = $this->getResult($value);
             $callback($value, $item, $result);
             $this->detach($value);
         };
@@ -91,8 +92,7 @@ class Resolver implements Observer
     protected function attach($value, Queueable $item)
     {
         if (!$this->storage->contains($value)) {
-            $result = clone $this->result;
-            $this->storage->attach($value, array($item, $result));
+            $this->storage->attach($value, $item);
         }
     }
 
@@ -110,24 +110,29 @@ class Resolver implements Observer
      * Returns result corresponding to the given item
      *
      * @param object $value
-     * @param \Valera\Queueable $item
-     * @param \Valera\Worker\Result $result
      *
+     * @return \Valera\Queueable $item
      * @throws \Exception
      */
-    public function getItemAndResult($value, Queueable &$item = null, Result &$result = null)
+    public function getItemByValue($value)
     {
         if (!$this->storage->offsetExists($value)) {
             throw new \Exception();
         }
 
-        list($item, $result) = $this->storage->offsetGet($value);
+        return $this->storage->offsetGet($value);
+    }
+
+    public function getResult()
+    {
+        return clone $this->result;
     }
 
     protected function handleUnexpectedExit()
     {
         foreach ($this->storage as $value) {
-            $this->getItemAndResult($value, $item, $result);
+            $item = $this->getItemByValue($value);
+            $result = $this->getResult();
             $result->fail('Script unexpectedly terminated');
             $this->resolve($value, $item, $result);
         }

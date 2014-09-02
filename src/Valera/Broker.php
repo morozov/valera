@@ -40,16 +40,21 @@ class Broker extends Base
     }
 
     /** {@inheritDoc} */
-    public function runIterator(\Iterator $values)
+    protected function runIterator(\Iterator $values)
     {
+        $count = 0;
         foreach ($values as $value) {
             $this->process($value);
+            $count++;
         }
+
+        return $count;
     }
 
     protected function process($value)
     {
-        $this->resolver->getItemAndResult($value, $item, $result);
+        $item = $this->resolver->getItemByValue($value);
+        $result = $this->resolver->getResult();
         try {
             $this->worker->process($value, $result);
         } catch (\Exception $e) {

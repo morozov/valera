@@ -2,9 +2,8 @@
 
 namespace Valera\Loader;
 
-use Valera\Resource;
+use Valera\Worker\WorkerInterface;
 
-interface LoaderInterface
+interface LoaderInterface extends WorkerInterface
 {
-    public function load(Resource $resource, Result $result);
 }

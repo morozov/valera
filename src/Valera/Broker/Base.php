@@ -31,6 +31,13 @@ abstract class Base implements BrokerInterface
     protected $queue;
 
     /**
+     * Queued item converter
+     *
+     * @var callable
+     */
+    protected $converter;
+
+    /**
      * Queue resolver
      *
      * @var \Valera\Queue\Resolver
@@ -56,6 +63,7 @@ abstract class Base implements BrokerInterface
         Assertion::allIsInstanceOf($resultHandlers, 'Valera\\Worker\\ResultHandler');
 
         $this->queue = $queue;
+        $this->converter = $converter;
         $this->resolver = $resolver;
         $this->resultHandlers = $resultHandlers;
         $this->setLogger($logger);
@@ -87,7 +95,7 @@ abstract class Base implements BrokerInterface
             }
         }
 
-        $this->resolver->resolve($item, $result);
+        $this->resolver->resolve($value, $item, $result);
     }
 
     /**
@@ -100,7 +108,7 @@ abstract class Base implements BrokerInterface
     public function run($limit = null)
     {
         $iterator = $this->getIterator($limit);
-        $this->runIterator($iterator);
+        return $this->runIterator($iterator);
     }
 
     /**
@@ -113,6 +121,8 @@ abstract class Base implements BrokerInterface
     protected function getIterator($limit = null)
     {
         $iterator = new Iterator($this->queue, $this->converter);
+        $iterator->attach($this->resolver);
+
         if ($limit) {
             $iterator = new \LimitIterator($iterator, 0, $limit);
         }
