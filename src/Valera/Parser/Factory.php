@@ -2,8 +2,6 @@
 
 namespace Valera\Parser;
 
-use Valera\Parser\Factory\CallbackParser;
-
 /**
  * Parser factory
  */
@@ -20,25 +18,14 @@ class Factory implements FactoryInterface
     protected $namespaces = array();
 
     /**
-     * @var \SplObjectStorage|AdapterInterface[]
-     */
-    protected $adapters = array();
-
-    /**
      * Constructor
      *
-     * @param string[]                          $namespaces
-     * @param \Valera\Parser\AdapterInterface[] $adapters
+     * @param string[] $namespaces
      */
-    public function __construct(array $namespaces = array(), array $adapters = array())
+    public function __construct(array $namespaces = array())
     {
         foreach ($namespaces as $namespace) {
             $this->registerNamespace($namespace);
-        }
-
-        $this->adapters = new \SplObjectStorage();
-        foreach ($adapters as $adapter) {
-            $this->registerAdapter($adapter);
         }
     }
 
@@ -69,13 +56,8 @@ class Factory implements FactoryInterface
     public function registerParser($type, $parser)
     {
         if (!$parser instanceof ParserInterface) {
-            $parser = $this->wrap($parser);
-        }
-
-        if (!$parser instanceof ParserInterface) {
             throw new \InvalidArgumentException(
-                'Parser class is loaded but does not implement'
-                . ' ParserInterface and cannot be wrapped into adapter'
+                'Parser class is loaded but does not implement ParserInterface'
             );
         }
 
@@ -95,26 +77,6 @@ class Factory implements FactoryInterface
     }
 
     /**
-     * Registers parser interface adapter
-     *
-     * @param AdapterInterface $adapter
-     */
-    public function registerAdapter(AdapterInterface $adapter)
-    {
-        $this->adapters->attach($adapter);
-    }
-
-    /**
-     * Unregisters parser interface adapter
-     *
-     * @param AdapterInterface $adapter
-     */
-    public function unregisterAdapter(AdapterInterface $adapter)
-    {
-        $this->adapters->detach($adapter);
-    }
-
-    /**
      * Returns class of parse of the given type, or NULL if class is not found
      *
      * @param string $type
@@ -127,27 +89,6 @@ class Factory implements FactoryInterface
             $class = $namespace . '\\' . $this->camelize($type, true);
             if (class_exists($class)) {
                 return new $class;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Wraps parser into ParserInterface, or returns NULL
-     * if the needed wrapper is not found
-     *
-     * @param mixed $parser
-     *
-     * @return ParserInterface|null
-     */
-    protected function wrap($parser)
-    {
-        foreach ($this->adapters as $adapter) {
-            if ($adapter->supports($parser)) {
-                $callback = $adapter->wrap($parser);
-                $wrapped = new CallbackParser($callback);
-                return $wrapped;
             }
         }
 

@@ -2,10 +2,8 @@
 
 namespace Valera\Parser;
 
-use Valera\Content;
-use Valera\Resource;
+use Valera\Worker\WorkerInterface;
 
-interface ParserInterface
+interface ParserInterface extends WorkerInterface
 {
-    public function parse(Content $content, Result $result, Resource $resource);
 }
