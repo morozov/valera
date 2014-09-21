@@ -1,6 +1,7 @@
 <?php
 
 namespace Valera\Worker;
+use Valera\Queue\Resolver;
 
 /**
  * Internal implementation of the worker
@@ -8,10 +9,10 @@ namespace Valera\Worker;
 interface WorkerInterface
 {
     /**
-     * @param \Traversable $tasks
-     * @param callable     $resolver
+     * @param \Traversable           $tasks
+     * @param \Valera\Queue\Resolver $resolver
      *
      * @return int Number of processed tasks
      */
-    public function process(\Traversable $tasks, callable $resolver);
+    public function process(\Traversable $tasks, Resolver $resolver);
 }
